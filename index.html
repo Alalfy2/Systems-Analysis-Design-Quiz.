@@ -1,0 +1,3830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>smart phone</title>
+    <style>
+:root {
+            --primary-color: #4CAF50;
+            --hover-color: #45a049;
+            --background-color: #f9f9f9;
+            --card-color: #fff;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: var(--background-color);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .question-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .option-label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            background-color: #dff0d8;
+            color: #3c763d;
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background-color: #f2dede;
+            color: #a94442;
+            display: block;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            margin: 20px auto;
+            padding: 12px 20px;
+            font-size: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--hover-color);
+        }
+
+        .result-container {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+        }          .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            display: none;
+        }
+        .show-explanation-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .show-explanation-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>smart phone</h1>
+        
+        <div class="score-display" id="currentScore">
+            Current Score: <span id="score">0</span>
+        </div>
+
+        <div id="quiz-container"></div>
+
+        <button class="submit-btn" onclick="calculateFinalScore()">Submit Quiz</button>
+
+        <div class="result-container" id="result">
+            <h2>Final Results</h2>
+            <p id="finalScore"></p>
+            <p id="percentage"></p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+        {
+        "id": "q1",
+        "text": "In computer architecture, what is the primary function of the Memory Address Register (MAR)?",
+        "options": [
+            { "value": "a", "text": "To store the data being transferred to or from memory" },
+            { "value": "b", "text": "To hold the address of the memory location to be accessed" },
+            { "value": "c", "text": "To store the instruction being executed" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Memory Address Register (MAR) holds the address of the memory location to be accessed. This is essential for fetching or storing data in the correct memory location."
+    },
+    {
+        "id": "q2",
+        "text": "Which of the following is NOT a type of flip-flop?",
+        "options": [
+            { "value": "a", "text": "R-S Flip Flop" },
+            { "value": "b", "text": "D Flip Flop" },
+            { "value": "c", "text": "J-K Flip Flop" },
+            { "value": "d", "text": "X-Y Flip Flop" }
+        ],
+        "correct": "d",
+        "explanation": "The X-Y Flip Flop is not a standard type of flip-flop. The standard types are R-S, D, J-K, and T Flip Flops."
+    },
+    {
+        "id": "q3",
+        "text": "True or False: The Instruction Register (IR) holds the address of the next instruction to be fetched from memory.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Instruction Register (IR) holds the current instruction being executed, not the address of the next instruction."
+    },
+    {
+        "id": "q4",
+        "text": "What is the main purpose of the Arithmetic Logic Unit (ALU)?",
+        "options": [
+            { "value": "a", "text": "To manage memory allocation" },
+            { "value": "b", "text": "To perform arithmetic and logical operations" },
+            { "value": "c", "text": "To control the flow of data between the CPU and I/O devices" },
+            { "value": "d", "text": "To store the operating system" }
+        ],
+        "correct": "b",
+        "explanation": "The ALU is responsible for performing arithmetic and logical operations in a computer."
+    },
+    {
+        "id": "q5",
+        "text": "True or False: Pipelining in computer architecture is used to reduce the number of instructions executed by the CPU.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. Pipelining is used to increase the throughput of the CPU by allowing multiple instructions to be processed simultaneously, not to reduce the number of instructions."
+    },
+    {
+        "id": "q6",
+        "text": "Which of the following is a characteristic of RISC architecture?",
+        "options": [
+            { "value": "a", "text": "Complex instructions" },
+            { "value": "b", "text": "Large number of addressing modes" },
+            { "value": "c", "text": "Simple instructions with a small instruction set" },
+            { "value": "d", "text": "Variable-length instructions" }
+        ],
+        "correct": "c",
+        "explanation": "RISC (Reduced Instruction Set Computing) architecture is characterized by simple instructions with a small instruction set."
+    },
+    {
+        "id": "q7",
+        "text": "True or False: The Memory Buffer Register (MBR) is used to hold the address of the memory location to be accessed.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Memory Buffer Register (MBR) holds the data being transferred to or from memory, not the address."
+    },
+    {
+        "id": "q8",
+        "text": "What is the primary role of the Control Unit in a CPU?",
+        "options": [
+            { "value": "a", "text": "To perform arithmetic operations" },
+            { "value": "b", "text": "To manage the flow of data between the CPU and memory" },
+            { "value": "c", "text": "To interpret and execute instructions" },
+            { "value": "d", "text": "To store temporary data" }
+        ],
+        "correct": "c",
+        "explanation": "The Control Unit is responsible for interpreting and executing instructions in a CPU."
+    },
+    {
+        "id": "q9",
+        "text": "True or False: The Program Counter (PC) holds the address of the current instruction being executed.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Program Counter (PC) holds the address of the next instruction to be fetched, not the current instruction."
+    },
+    {
+        "id": "q10",
+        "text": "Which of the following is NOT a component of the Instruction Set Architecture (ISA)?",
+        "options": [
+            { "value": "a", "text": "Instructions/Commands" },
+            { "value": "b", "text": "Registers" },
+            { "value": "c", "text": "Formats" },
+            { "value": "d", "text": "Cache Memory" }
+        ],
+        "correct": "d",
+        "explanation": "Cache Memory is not a component of the ISA. The ISA includes instructions, registers, and formats."
+    },
+    {
+        "id": "q11",
+        "text": "True or False: In a multicore processor, each core has its own ALU, control unit, and registers.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "a",
+        "explanation": "True. In a multicore processor, each core has its own ALU, control unit, and registers."
+    },
+    {
+        "id": "q12",
+        "text": "Which of the following is an example of a system interconnection mechanism?",
+        "options": [
+            { "value": "a", "text": "ALU" },
+            { "value": "b", "text": "System Bus" },
+            { "value": "c", "text": "Cache Memory" },
+            { "value": "d", "text": "Instruction Register" }
+        ],
+        "correct": "b",
+        "explanation": "The System Bus is a common example of a system interconnection mechanism that allows communication between the CPU, memory, and I/O devices."
+    },
+    {
+        "id": "q13",
+        "text": "True or False: The Accumulator (AC) is used to hold temporary operands and results of ALU operations.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "a",
+        "explanation": "True. The Accumulator (AC) is used to hold temporary operands and results of ALU operations."
+    },
+    {
+        "id": "q14",
+        "text": "Which of the following is a characteristic of CISC architecture?",
+        "options": [
+            { "value": "a", "text": "Simple instructions" },
+            { "value": "b", "text": "Small instruction set" },
+            { "value": "c", "text": "Complex instructions with a large instruction set" },
+            { "value": "d", "text": "Fixed-length instructions" }
+        ],
+        "correct": "c",
+        "explanation": "CISC (Complex Instruction Set Computing) architecture is characterized by complex instructions with a large instruction set."
+    },
+    {
+        "id": "q15",
+        "text": "True or False: The Instruction Buffer Register (IBR) is used to hold the left-hand instruction from a word in memory.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Instruction Buffer Register (IBR) is used to hold the right-hand instruction from a word in memory."
+    },
+    {
+        "id": "q16",
+        "text": "Which of the following is NOT a function of the Control Unit?",
+        "options": [
+            { "value": "a", "text": "Fetching instructions from memory" },
+            { "value": "b", "text": "Decoding instructions" },
+            { "value": "c", "text": "Performing arithmetic operations" },
+            { "value": "d", "text": "Executing instructions" }
+        ],
+        "correct": "c",
+        "explanation": "Performing arithmetic operations is the function of the ALU, not the Control Unit."
+    },
+    {
+        "id": "q17",
+        "text": "True or False: The Memory Buffer Register (MBR) is used to receive a word from memory or from the I/O unit.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "a",
+        "explanation": "True. The Memory Buffer Register (MBR) is used to receive a word from memory or from the I/O unit."
+    },
+    {
+        "id": "q18",
+        "text": "Which of the following is a key difference between direct and indirect addressing modes?",
+        "options": [
+            { "value": "a", "text": "Direct addressing uses a register, while indirect addressing uses memory." },
+            { "value": "b", "text": "Direct addressing specifies the actual address, while indirect addressing specifies the address of the address." },
+            { "value": "c", "text": "Direct addressing is faster, while indirect addressing is slower." },
+            { "value": "d", "text": "Direct addressing is used for I/O operations, while indirect addressing is used for memory operations." }
+        ],
+        "correct": "b",
+        "explanation": "Direct addressing specifies the actual address of the data, while indirect addressing specifies the address of the address where the data is stored."
+    },
+    {
+        "id": "q19",
+        "text": "True or False: The Program Counter (PC) is incremented after each instruction fetch.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "a",
+        "explanation": "True. The Program Counter (PC) is incremented after each instruction fetch to point to the next instruction."
+    },
+    {
+        "id": "q20",
+        "text": "Which of the following is NOT a type of addressing mode?",
+        "options": [
+            { "value": "a", "text": "Direct Addressing" },
+            { "value": "b", "text": "Indirect Addressing" },
+            { "value": "c", "text": "Immediate Addressing" },
+            { "value": "d", "text": "Parallel Addressing" }
+        ],
+        "correct": "d",
+        "explanation": "Parallel Addressing is not a standard type of addressing mode. The standard types include Direct, Indirect, and Immediate Addressing."
+    },
+    {
+        "id": "q21",
+        "text": "True or False: The Instruction Set Architecture (ISA) defines the set of commands that a processor can perform.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "a",
+        "explanation": "True. The ISA defines the set of commands that a processor can perform to execute program instructions."
+    },
+    {
+        "id": "q22",
+        "text": "Which of the following is a characteristic of a multicore processor?",
+        "options": [
+            { "value": "a", "text": "Each core shares the same ALU and control unit." },
+            { "value": "b", "text": "Each core has its own ALU, control unit, and registers." },
+            { "value": "c", "text": "Multicore processors are slower than single-core processors." },
+            { "value": "d", "text": "Multicore processors have a single shared cache memory." }
+        ],
+        "correct": "b",
+        "explanation": "In a multicore processor, each core has its own ALU, control unit, and registers."
+    },
+    {
+        "id": "q23",
+        "text": "True or False: The Instruction Register (IR) holds the opcode of the instruction being executed.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "a",
+        "explanation": "True. The Instruction Register (IR) holds the opcode of the instruction being executed."
+    },
+    {
+        "id": "q24",
+        "text": "Which of the following is NOT a function of the ALU?",
+        "options": [
+            { "value": "a", "text": "Performing arithmetic operations" },
+            { "value": "b", "text": "Performing logical operations" },
+            { "value": "c", "text": "Managing memory allocation" },
+            { "value": "d", "text": "Shifting bits" }
+        ],
+        "correct": "c",
+        "explanation": "Managing memory allocation is not a function of the ALU. The ALU performs arithmetic, logical operations, and bit shifting."
+    },
+    {
+        "id": "q25",
+        "text": "True or False: The Memory Address Register (MAR) is used to store the data being transferred to or from memory.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Memory Address Register (MAR) holds the address of the memory location to be accessed, not the data."
+    },
+    {
+        "id": "q26",
+        "text": "Which of the following is a key advantage of pipelining in computer architecture?",
+        "options": [
+            { "value": "a", "text": "It reduces the number of instructions executed by the CPU." },
+            { "value": "b", "text": "It increases the clock speed of the CPU." },
+            { "value": "c", "text": "It allows multiple instructions to be processed simultaneously." },
+            { "value": "d", "text": "It reduces the size of the instruction set." }
+        ],
+        "correct": "c",
+        "explanation": "Pipelining allows multiple instructions to be processed simultaneously, increasing the throughput of the CPU."
+    },
+    {
+        "id": "q27",
+        "text": "True or False: The Instruction Buffer Register (IBR) is used to hold the left-hand instruction from a word in memory.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Instruction Buffer Register (IBR) is used to hold the right-hand instruction from a word in memory."
+    },
+    {
+        "id": "q28",
+        "text": "Which of the following is a characteristic of backward compatibility?",
+        "options": [
+            { "value": "a", "text": "New hardware can run existing software." },
+            { "value": "b", "text": "New software can run on older hardware." },
+            { "value": "c", "text": "It is only supported for one generation of hardware." },
+            { "value": "d", "text": "It is not commonly used in modern computers." }
+        ],
+        "correct": "a",
+        "explanation": "Backward compatibility means that new hardware can run existing software."
+    },
+    {
+        "id": "q29",
+        "text": "True or False: The Accumulator (AC) is used to hold the address of the next instruction to be fetched.",
+        "options": [
+            { "value": "a", "text": "True" },
+            { "value": "b", "text": "False" }
+        ],
+        "correct": "b",
+        "explanation": "False. The Accumulator (AC) is used to hold temporary operands and results of ALU operations, not the address of the next instruction."
+    },
+    {
+        "id": "q30",
+        "text": "Which of the following is a key component of the Instruction Set Architecture (ISA)?",
+        "options": [
+            { "value": "a", "text": "Cache Memory" },
+            { "value": "b", "text": "System Bus" },
+            { "value": "c", "text": "Registers" },
+            { "value": "d", "text": "Hard Disk" }
+        ],
+        "correct": "c",
+        "explanation": "Registers are a key component of the ISA, as they are used to hold data and instructions during processing."
+    },
+    {
+        "id": "q31",
+        "text": "In computer architecture, what is the primary function of the Memory Address Register (MAR)?",
+        "options": [
+            { "value": "a", "text": "To store the data being transferred to or from memory" },
+            { "value": "b", "text": "To hold the address of the memory location to be accessed" },
+            { "value": "c", "text": "To store the instruction being executed" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Memory Address Register (MAR) holds the address of the memory location to be accessed. This is essential for fetching or storing data in the correct memory location."
+    },
+    {
+        "id": "q32",
+        "text": "Which generation of computers used vacuum tubes as their primary electronic component?",
+        "options": [
+            { "value": "a", "text": "First Generation" },
+            { "value": "b", "text": "Second Generation" },
+            { "value": "c", "text": "Third Generation" },
+            { "value": "d", "text": "Fourth Generation" }
+        ],
+        "correct": "a",
+        "explanation": "The first generation of computers (1946-1956) used vacuum tubes as their primary electronic component."
+    },
+    {
+        "id": "q33",
+        "text": "What is the main purpose of the Control Unit (CU) in a CPU?",
+        "options": [
+            { "value": "a", "text": "To perform arithmetic and logic operations" },
+            { "value": "b", "text": "To manage the flow of data within the CPU" },
+            { "value": "c", "text": "To store temporary data" },
+            { "value": "d", "text": "To control the execution of instructions" }
+        ],
+        "correct": "d",
+        "explanation": "The Control Unit (CU) is responsible for controlling the execution of instructions within the CPU."
+    },
+    {
+        "id": "q34",
+        "text": "Which of the following is NOT a characteristic of the second generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of transistors" },
+            { "value": "b", "text": "Smaller size compared to first generation" },
+            { "value": "c", "text": "Use of vacuum tubes" },
+            { "value": "d", "text": "Increased reliability" }
+        ],
+        "correct": "c",
+        "explanation": "The second generation of computers used transistors, not vacuum tubes, which were characteristic of the first generation."
+    },
+    {
+        "id": "q35",
+        "text": "What is the primary function of the Arithmetic and Logic Unit (ALU)?",
+        "options": [
+            { "value": "a", "text": "To control the flow of data within the CPU" },
+            { "value": "b", "text": "To perform arithmetic and logic operations" },
+            { "value": "c", "text": "To store temporary data" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Arithmetic and Logic Unit (ALU) is responsible for performing arithmetic and logic operations in the CPU."
+    },
+    {
+        "id": "q36",
+        "text": "Which of the following is a characteristic of the fourth generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of integrated circuits" },
+            { "value": "c", "text": "Use of microprocessors" },
+            { "value": "d", "text": "Use of transistors" }
+        ],
+        "correct": "c",
+        "explanation": "The fourth generation of computers is characterized by the use of microprocessors."
+    },
+    {
+        "id": "q37",
+        "text": "What is the purpose of the Instruction Register (IR) in a CPU?",
+        "options": [
+            { "value": "a", "text": "To hold the address of the next instruction to be executed" },
+            { "value": "b", "text": "To store the instruction currently being executed" },
+            { "value": "c", "text": "To manage the flow of data within the CPU" },
+            { "value": "d", "text": "To perform arithmetic and logic operations" }
+        ],
+        "correct": "b",
+        "explanation": "The Instruction Register (IR) holds the instruction currently being executed by the CPU."
+    },
+    {
+        "id": "q38",
+        "text": "Which of the following is a key feature of the third generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "c",
+        "explanation": "The third generation of computers is characterized by the use of integrated circuits."
+    },
+    {
+        "id": "q39",
+        "text": "What is the primary function of the Program Counter (PC) in a CPU?",
+        "options": [
+            { "value": "a", "text": "To store the data being transferred to or from memory" },
+            { "value": "b", "text": "To hold the address of the next instruction to be executed" },
+            { "value": "c", "text": "To manage the cache memory" },
+            { "value": "d", "text": "To perform arithmetic and logic operations" }
+        ],
+        "correct": "b",
+        "explanation": "The Program Counter (PC) holds the address of the next instruction to be executed by the CPU."
+    },
+    {
+        "id": "q40",
+        "text": "Which of the following is NOT a component of the CPU?",
+        "options": [
+            { "value": "a", "text": "Control Unit (CU)" },
+            { "value": "b", "text": "Arithmetic and Logic Unit (ALU)" },
+            { "value": "c", "text": "Memory Address Register (MAR)" },
+            { "value": "d", "text": "Input/Output Module (I/O)" }
+        ],
+        "correct": "d",
+        "explanation": "The Input/Output Module (I/O) is not a component of the CPU; it is part of the computer's overall architecture."
+    },
+    {
+        "id": "q41",
+        "text": "What is the main purpose of the Data Bus in a computer system?",
+        "options": [
+            { "value": "a", "text": "To carry control signals" },
+            { "value": "b", "text": "To carry data between the CPU and memory" },
+            { "value": "c", "text": "To carry addresses of memory locations" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Data Bus is responsible for carrying data between the CPU and memory."
+    },
+    {
+        "id": "q42",
+        "text": "Which of the following is a characteristic of the first generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of transistors" },
+            { "value": "b", "text": "Use of vacuum tubes" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "b",
+        "explanation": "The first generation of computers is characterized by the use of vacuum tubes."
+    },
+    {
+        "id": "q43",
+        "text": "What is the primary function of the Control Bus in a computer system?",
+        "options": [
+            { "value": "a", "text": "To carry data between the CPU and memory" },
+            { "value": "b", "text": "To carry addresses of memory locations" },
+            { "value": "c", "text": "To carry control signals" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "c",
+        "explanation": "The Control Bus is responsible for carrying control signals within the computer system."
+    },
+    {
+        "id": "q44",
+        "text": "Which of the following is a key feature of the second generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "b",
+        "explanation": "The second generation of computers is characterized by the use of transistors."
+    },
+    {
+        "id": "q45",
+        "text": "What is the primary function of the Address Bus in a computer system?",
+        "options": [
+            { "value": "a", "text": "To carry data between the CPU and memory" },
+            { "value": "b", "text": "To carry addresses of memory locations" },
+            { "value": "c", "text": "To carry control signals" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Address Bus is responsible for carrying addresses of memory locations within the computer system."
+    },
+    {
+        "id": "q46",
+        "text": "Which of the following is a characteristic of the third generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "c",
+        "explanation": "The third generation of computers is characterized by the use of integrated circuits."
+    },
+    {
+        "id": "q47",
+        "text": "What is the primary function of the Memory Data Register (MDR)?",
+        "options": [
+            { "value": "a", "text": "To hold the address of the memory location to be accessed" },
+            { "value": "b", "text": "To store the data being transferred to or from memory" },
+            { "value": "c", "text": "To store the instruction being executed" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Memory Data Register (MDR) stores the data being transferred to or from memory."
+    },
+    {
+        "id": "q48",
+        "text": "Which of the following is a key feature of the fourth generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "d",
+        "explanation": "The fourth generation of computers is characterized by the use of microprocessors."
+    },
+    {
+        "id": "q49",
+        "text": "What is the primary function of the Instruction Cycle in a CPU?",
+        "options": [
+            { "value": "a", "text": "To perform arithmetic and logic operations" },
+            { "value": "b", "text": "To fetch and execute instructions" },
+            { "value": "c", "text": "To manage the cache memory" },
+            { "value": "d", "text": "To control the flow of data within the CPU" }
+        ],
+        "correct": "b",
+        "explanation": "The Instruction Cycle in a CPU involves fetching and executing instructions."
+    },
+    {
+        "id": "q50",
+        "text": "Which of the following is NOT a characteristic of the first generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Large size" },
+            { "value": "c", "text": "High reliability" },
+            { "value": "d", "text": "High power consumption" }
+        ],
+        "correct": "c",
+        "explanation": "The first generation of computers was not known for high reliability; they were prone to frequent failures."
+    },
+    {
+        "id": "q51",
+        "text": "What is the primary function of the Fetch Cycle in the Instruction Cycle?",
+        "options": [
+            { "value": "a", "text": "To execute the instruction" },
+            { "value": "b", "text": "To fetch the instruction from memory" },
+            { "value": "c", "text": "To perform arithmetic and logic operations" },
+            { "value": "d", "text": "To manage the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The Fetch Cycle involves fetching the instruction from memory to be executed by the CPU."
+    },
+    {
+        "id": "q52",
+        "text": "Which of the following is a characteristic of the second generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "b",
+        "explanation": "The second generation of computers is characterized by the use of transistors."
+    },
+    {
+        "id": "q53",
+        "text": "What is the primary function of the Execute Cycle in the Instruction Cycle?",
+        "options": [
+            { "value": "a", "text": "To fetch the instruction from memory" },
+            { "value": "b", "text": "To execute the instruction" },
+            { "value": "c", "text": "To manage the cache memory" },
+            { "value": "d", "text": "To control the flow of data within the CPU" }
+        ],
+        "correct": "b",
+        "explanation": "The Execute Cycle involves executing the instruction that was fetched during the Fetch Cycle."
+    },
+    {
+        "id": "q54",
+        "text": "Which of the following is a characteristic of the third generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "c",
+        "explanation": "The third generation of computers is characterized by the use of integrated circuits."
+    },
+    {
+        "id": "q55",
+        "text": "What is the primary function of the Instruction Set Architecture (ISA)?",
+        "options": [
+            { "value": "a", "text": "To manage the cache memory" },
+            { "value": "b", "text": "To define the set of instructions that a CPU can execute" },
+            { "value": "c", "text": "To control the flow of data within the CPU" },
+            { "value": "d", "text": "To perform arithmetic and logic operations" }
+        ],
+        "correct": "b",
+        "explanation": "The Instruction Set Architecture (ISA) defines the set of instructions that a CPU can execute."
+    },
+    {
+        "id": "q56",
+        "text": "Which of the following is a characteristic of the fourth generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "d",
+        "explanation": "The fourth generation of computers is characterized by the use of microprocessors."
+    },
+    {
+        "id": "q57",
+        "text": "What is the primary function of the Microarchitecture in a CPU?",
+        "options": [
+            { "value": "a", "text": "To define the set of instructions that a CPU can execute" },
+            { "value": "b", "text": "To manage the cache memory" },
+            { "value": "c", "text": "To implement the Instruction Set Architecture (ISA)" },
+            { "value": "d", "text": "To control the flow of data within the CPU" }
+        ],
+        "correct": "c",
+        "explanation": "The Microarchitecture is responsible for implementing the Instruction Set Architecture (ISA) in a CPU."
+    },
+    {
+        "id": "q58",
+        "text": "Which of the following is a characteristic of the first generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of transistors" },
+            { "value": "b", "text": "Use of vacuum tubes" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "b",
+        "explanation": "The first generation of computers is characterized by the use of vacuum tubes."
+    },
+    {
+        "id": "q59",
+        "text": "What is the primary function of the System Design in computer architecture?",
+        "options": [
+            { "value": "a", "text": "To define the set of instructions that a CPU can execute" },
+            { "value": "b", "text": "To manage the cache memory" },
+            { "value": "c", "text": "To implement the Instruction Set Architecture (ISA)" },
+            { "value": "d", "text": "To design the overall hardware components of a computer system" }
+        ],
+        "correct": "d",
+        "explanation": "System Design involves designing the overall hardware components of a computer system."
+    },
+    {
+        "id": "q60",
+        "text": "Which of the following is a characteristic of the second generation of computers?",
+        "options": [
+            { "value": "a", "text": "Use of vacuum tubes" },
+            { "value": "b", "text": "Use of transistors" },
+            { "value": "c", "text": "Use of integrated circuits" },
+            { "value": "d", "text": "Use of microprocessors" }
+        ],
+        "correct": "b",
+        "explanation": "The second generation of computers is characterized by the use of transistors."
+    },
+    {
+        id: 'q60.1',
+        text: 'In computer architecture, what is the primary function of the Memory Address Register (MAR)?',
+        options: [
+            { value: 'a', text: 'To store the data being transferred to or from memory' },
+            { value: 'b', text: 'To hold the address of the memory location to be accessed' },
+            { value: 'c', text: 'To store the instruction being executed' },
+            { value: 'd', text: 'To manage the cache memory' }
+        ],
+        correct: 'b',
+        explanation: 'The Memory Address Register (MAR) holds the address of the memory location to be accessed. This is essential for fetching or storing data in the correct memory location.'
+    },
+    {
+        id: 'q61',
+        text: 'Which of the following is NOT a key concept of von Neumann architecture?',
+        options: [
+            { value: 'a', text: 'Data and instructions are stored in a single read-write memory' },
+            { value: 'b', text: 'Memory is addressable by location' },
+            { value: 'c', text: 'Execution occurs in a parallel fashion' },
+            { value: 'd', text: 'Instructions are executed sequentially unless explicitly modified' }
+        ],
+        correct: 'c',
+        explanation: 'Von Neumann architecture executes instructions sequentially, not in parallel.'
+    },
+    {
+        id: 'q62',
+        text: 'What is the primary function of the Control Unit (CU) in a CPU?',
+        options: [
+            { value: 'a', text: 'Perform arithmetic and logical operations' },
+            { value: 'b', text: 'Fetch and decode instructions' },
+            { value: 'c', text: 'Manage data storage in memory' },
+            { value: 'd', text: 'Control the flow of data between CPU and I/O devices' }
+        ],
+        correct: 'b',
+        explanation: 'The Control Unit (CU) is responsible for fetching and decoding instructions.'
+    },
+    {
+        id: 'q63',
+        text: 'Which of the following is NOT a component of the CPU?',
+        options: [
+            { value: 'a', text: 'Arithmetic Logic Unit (ALU)' },
+            { value: 'b', text: 'Control Unit (CU)' },
+            { value: 'c', text: 'Memory Buffer Register (MBR)' },
+            { value: 'd', text: 'Input/Output Module' }
+        ],
+        correct: 'd',
+        explanation: 'The Input/Output Module is not part of the CPU; it is a separate component.'
+    },
+    {
+        id: 'q64',
+        text: 'What is the purpose of the Program Counter (PC) in a CPU?',
+        options: [
+            { value: 'a', text: 'Store the result of arithmetic operations' },
+            { value: 'b', text: 'Hold the address of the next instruction to fetch' },
+            { value: 'c', text: 'Store data temporarily during execution' },
+            { value: 'd', text: 'Manage interrupts from I/O devices' }
+        ],
+        correct: 'b',
+        explanation: 'The Program Counter (PC) holds the address of the next instruction to fetch.'
+    },
+    {
+        id: 'q65',
+        text: 'Which of the following is an example of a Program Interrupt?',
+        options: [
+            { value: 'a', text: 'Division by zero' },
+            { value: 'b', text: 'Timer interrupt' },
+            { value: 'c', text: 'I/O interrupt' },
+            { value: 'd', text: 'Power failure' }
+        ],
+        correct: 'a',
+        explanation: 'A Program Interrupt occurs due to conditions like division by zero or illegal instructions.'
+    },
+    {
+        id: 'q66',
+        text: 'What is the main advantage of using interrupts in a computer system?',
+        options: [
+            { value: 'a', text: 'It increases the speed of the CPU' },
+            { value: 'b', text: 'It allows the CPU to perform other tasks while waiting for I/O operations' },
+            { value: 'c', text: 'It reduces the need for memory' },
+            { value: 'd', text: 'It simplifies the instruction set' }
+        ],
+        correct: 'b',
+        explanation: 'Interrupts allow the CPU to perform other tasks while waiting for I/O operations, improving efficiency.'
+    },
+    {
+        id: 'q67',
+        text: 'Which of the following is NOT a type of interrupt?',
+        options: [
+            { value: 'a', text: 'Program interrupt' },
+            { value: 'b', text: 'Timer interrupt' },
+            { value: 'c', text: 'Memory interrupt' },
+            { value: 'd', text: 'Hardware failure interrupt' }
+        ],
+        correct: 'c',
+        explanation: 'There is no such thing as a "Memory interrupt"; interrupts are typically program, timer, I/O, or hardware failure related.'
+    },
+    {
+        id: 'q68',
+        text: 'In a hypothetical machine with a 16-bit instruction format, if 4 bits are used for the opcode, how many different opcodes can be represented?',
+        options: [
+            { value: 'a', text: '8' },
+            { value: 'b', text: '16' },
+            { value: 'c', text: '32' },
+            { value: 'd', text: '64' }
+        ],
+        correct: 'b',
+        explanation: 'With 4 bits, 2^4 = 16 different opcodes can be represented.'
+    },
+    {
+        id: 'q69',
+        text: 'What is the purpose of the Memory Buffer Register (MBR)?',
+        options: [
+            { value: 'a', text: 'To hold the address of the memory location to be accessed' },
+            { value: 'b', text: 'To store the data being transferred to or from memory' },
+            { value: 'c', text: 'To store the instruction being executed' },
+            { value: 'd', text: 'To manage the cache memory' }
+        ],
+        correct: 'b',
+        explanation: 'The Memory Buffer Register (MBR) stores data being transferred to or from memory.'
+    },
+    {
+        id: 'q70',
+        text: 'Which of the following is true about the Fetch Cycle in the instruction cycle?',
+        options: [
+            { value: 'a', text: 'It decodes the instruction' },
+            { value: 'b', text: 'It executes the instruction' },
+            { value: 'c', text: 'It fetches the instruction from memory' },
+            { value: 'd', text: 'It stores the result in memory' }
+        ],
+        correct: 'c',
+        explanation: 'The Fetch Cycle involves fetching the instruction from memory.'
+    },
+    {
+        id: 'q71',
+        text: 'What is the primary purpose of the Arithmetic Logic Unit (ALU)?',
+        options: [
+            { value: 'a', text: 'Fetch instructions from memory' },
+            { value: 'b', text: 'Perform arithmetic and logical operations' },
+            { value: 'c', text: 'Manage data transfer between CPU and I/O devices' },
+            { value: 'd', text: 'Control the flow of data within the CPU' }
+        ],
+        correct: 'b',
+        explanation: 'The ALU performs arithmetic and logical operations.'
+    },
+    {
+        id: 'q72',
+        text: 'Which of the following is NOT a step in the instruction cycle?',
+        options: [
+            { value: 'a', text: 'Fetch' },
+            { value: 'b', text: 'Decode' },
+            { value: 'c', text: 'Execute' },
+            { value: 'd', text: 'Interrupt' }
+        ],
+        correct: 'd',
+        explanation: 'The Interrupt Cycle is not a standard step in the basic instruction cycle.'
+    },
+    {
+        id: 'q73',
+        text: 'What is the purpose of the Interrupt Cycle in the instruction cycle?',
+        options: [
+            { value: 'a', text: 'To fetch the next instruction' },
+            { value: 'b', text: 'To execute the current instruction' },
+            { value: 'c', text: 'To handle interrupts from external devices' },
+            { value: 'd', text: 'To store the result of an operation' }
+        ],
+        correct: 'c',
+        explanation: 'The Interrupt Cycle handles interrupts from external devices.'
+    },
+    {
+        id: 'q74',
+        text: 'Which of the following is true about the von Neumann architecture?',
+        options: [
+            { value: 'a', text: 'It uses separate memory for data and instructions' },
+            { value: 'b', text: 'It allows parallel execution of instructions' },
+            { value: 'c', text: 'It stores data and instructions in the same memory' },
+            { value: 'd', text: 'It does not use a Program Counter (PC)' }
+        ],
+        correct: 'c',
+        explanation: 'Von Neumann architecture stores data and instructions in the same memory.'
+    },
+    {
+        id: 'q75',
+        text: 'In von Neumann architecture, data and instructions are stored in separate memories.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'In von Neumann architecture, data and instructions are stored in the same memory.'
+    },
+    {
+        id: 'q76',
+        text: 'Hardwired programming is more flexible than software programming.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'Hardwired programming is less flexible than software programming because it requires physical rewiring to change functionality.'
+    },
+    {
+        id: 'q77',
+        text: 'The Control Unit (CU) is responsible for performing arithmetic operations.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'The Control Unit (CU) fetches and decodes instructions, while the ALU performs arithmetic operations.'
+    },
+    {
+        id: 'q78',
+        text: 'The Program Counter (PC) holds the address of the next instruction to be executed.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'a',
+        explanation: 'The Program Counter (PC) holds the address of the next instruction to be executed.'
+    },
+    {
+        id: 'q79',
+        text: 'An interrupt is a signal that stops the CPU from executing the current program.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'a',
+        explanation: 'An interrupt is a signal that temporarily stops the CPU from executing the current program to handle a higher-priority task.'
+    },
+    {
+        id: 'q80',
+        text: 'The Fetch Cycle is the step where the CPU executes the instruction.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'The Fetch Cycle is where the CPU fetches the instruction from memory; execution happens in the Execute Cycle.'
+    },
+    {
+        id: 'q81',
+        text: 'The Memory Buffer Register (MBR) holds the address of the memory location to be accessed.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'The Memory Address Register (MAR) holds the address, while the MBR holds the data being transferred.'
+    },
+    {
+        id: 'q82',
+        text: 'In a 16-bit instruction format, if 4 bits are used for the opcode, the remaining 12 bits are used for the address.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'a',
+        explanation: 'In a 16-bit instruction format, 4 bits for the opcode leave 12 bits for the address.'
+    },
+    {
+        id: 'q83',
+        text: 'The Arithmetic Logic Unit (ALU) is part of the Control Unit (CU).',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'The ALU is a separate component from the Control Unit (CU).'
+    },
+    {
+        id: 'q84',
+        text: 'Interrupts are used to improve the efficiency of the CPU by allowing it to perform other tasks while waiting for I/O operations.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'a',
+        explanation: 'Interrupts allow the CPU to handle other tasks while waiting for I/O operations, improving efficiency.'
+    },
+    {
+        id: 'q85',
+        text: 'A Timer Interrupt is generated by an external device like a printer.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'A Timer Interrupt is generated by an internal timer, not by an external device.'
+    },
+    {
+        id: 'q86',
+        text: 'The von Neumann architecture allows for parallel execution of instructions.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'Von Neumann architecture executes instructions sequentially, not in parallel.'
+    },
+    {
+        id: 'q87',
+        text: 'The Memory Address Register (MAR) is used to store data temporarily during execution.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'The MAR holds the address of the memory location to be accessed, not data.'
+    },
+    {
+        id: 'q88',
+        text: 'In the Execute Cycle, the CPU performs the operation specified by the instruction.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'a',
+        explanation: 'The Execute Cycle is where the CPU performs the operation specified by the instruction.'
+    },
+    {
+        id: 'q89',
+        text: 'The Interrupt Cycle is always the last step in the instruction cycle.',
+        options: [
+            { value: 'a', text: 'True' },
+            { value: 'b', text: 'False' }
+        ],
+        correct: 'b',
+        explanation: 'The Interrupt Cycle is not always the last step; it occurs when an interrupt is detected.'
+    },
+    {
+    id: 'q91',
+    text: 'What is the primary purpose of the Memory Data Register (MDR) in a computer system?',
+    options: [
+        { value: 'a', text: 'To store the address of the memory location being accessed' },
+        { value: 'b', text: 'To temporarily hold data being transferred to or from memory' },
+        { value: 'c', text: 'To manage the control signals for memory access' },
+        { value: 'd', text: 'To store the program counter value' }
+    ],
+    correct: 'b',
+    explanation: 'The Memory Data Register (MDR) temporarily holds data that is being transferred to or from memory. It acts as a buffer between the CPU and memory.'
+},
+{
+    id: 'q92',
+    text: 'Which of the following is a key function of the Program Counter (PC) in a CPU?',
+    options: [
+        { value: 'a', text: 'To store the address of the next instruction to be executed' },
+        { value: 'b', text: 'To hold the data being processed by the CPU' },
+        { value: 'c', text: 'To manage the interrupt requests' },
+        { value: 'd', text: 'To control the clock speed of the CPU' }
+    ],
+    correct: 'a',
+    explanation: 'The Program Counter (PC) holds the address of the next instruction to be executed, allowing the CPU to fetch instructions in sequence.'
+},
+{
+    id: 'q93',
+    text: 'What is the primary role of the Arithmetic Logic Unit (ALU) in a CPU?',
+    options: [
+        { value: 'a', text: 'To manage memory access' },
+        { value: 'b', text: 'To perform arithmetic and logical operations' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of computations' }
+    ],
+    correct: 'b',
+    explanation: 'The Arithmetic Logic Unit (ALU) is responsible for performing arithmetic (e.g., addition, subtraction) and logical (e.g., AND, OR) operations.'
+},
+{
+    id: 'q94',
+    text: 'Which of the following is true about the Control Unit (CU) in a CPU?',
+    options: [
+        { value: 'a', text: 'It performs arithmetic operations' },
+        { value: 'b', text: 'It manages the execution of instructions by generating control signals' },
+        { value: 'c', text: 'It stores data temporarily during processing' },
+        { value: 'd', text: 'It acts as a buffer between the CPU and memory' }
+    ],
+    correct: 'b',
+    explanation: 'The Control Unit (CU) generates control signals that manage the execution of instructions and coordinate the activities of the CPU.'
+},
+{
+    id: 'q95',
+    text: 'What is the primary function of the Instruction Register (IR) in a CPU?',
+    options: [
+        { value: 'a', text: 'To store the address of the next instruction' },
+        { value: 'b', text: 'To hold the current instruction being executed' },
+        { value: 'c', text: 'To manage the flow of data between the CPU and memory' },
+        { value: 'd', text: 'To perform arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The Instruction Register (IR) holds the current instruction that is being executed by the CPU.'
+},
+{
+    id: 'q96',
+    text: 'Which of the following is a key characteristic of RISC (Reduced Instruction Set Computing) architecture?',
+    options: [
+        { value: 'a', text: 'Complex instructions that perform multiple operations' },
+        { value: 'b', text: 'A large number of instructions' },
+        { value: 'c', text: 'Simple instructions that execute in a single clock cycle' },
+        { value: 'd', text: 'High power consumption' }
+    ],
+    correct: 'c',
+    explanation: 'RISC architecture uses simple instructions that can be executed in a single clock cycle, leading to faster processing.'
+},
+{
+    id: 'q97',
+    text: 'What is the primary advantage of using a cache memory in a computer system?',
+    options: [
+        { value: 'a', text: 'It increases the size of the main memory' },
+        { value: 'b', text: 'It reduces the access time for frequently used data' },
+        { value: 'c', text: 'It manages the power consumption of the CPU' },
+        { value: 'd', text: 'It stores the operating system' }
+    ],
+    correct: 'b',
+    explanation: 'Cache memory reduces the access time for frequently used data by storing a copy of it closer to the CPU.'
+},
+{
+    id: 'q98',
+    text: 'Which of the following is true about virtual memory?',
+    options: [
+        { value: 'a', text: 'It is faster than main memory' },
+        { value: 'b', text: 'It allows the system to use disk space as an extension of RAM' },
+        { value: 'c', text: 'It is a type of cache memory' },
+        { value: 'd', text: 'It is physically located inside the CPU' }
+    ],
+    correct: 'b',
+    explanation: 'Virtual memory allows the system to use disk space as an extension of RAM, enabling it to run larger applications than the physical memory would allow.'
+},
+{
+    id: 'q99',
+    text: 'What is the primary purpose of the Translation Lookaside Buffer (TLB) in a CPU?',
+    options: [
+        { value: 'a', text: 'To store the results of arithmetic operations' },
+        { value: 'b', text: 'To speed up the translation of virtual addresses to physical addresses' },
+        { value: 'c', text: 'To manage the cache memory' },
+        { value: 'd', text: 'To control the flow of data between the CPU and peripherals' }
+    ],
+    correct: 'b',
+    explanation: 'The Translation Lookaside Buffer (TLB) speeds up the translation of virtual addresses to physical addresses, improving memory access times.'
+},
+{
+    id: 'q100',
+    text: 'Which of the following is a key feature of pipelining in CPU architecture?',
+    options: [
+        { value: 'a', text: 'It reduces the number of instructions executed per clock cycle' },
+        { value: 'b', text: 'It allows multiple instructions to be processed simultaneously' },
+        { value: 'c', text: 'It increases the complexity of the instruction set' },
+        { value: 'd', text: 'It reduces the size of the cache memory' }
+    ],
+    correct: 'b',
+    explanation: 'Pipelining allows multiple instructions to be processed simultaneously by dividing the execution process into stages.'
+},
+{
+    id: 'q101',
+    text: 'What is the primary function of the Stack Pointer (SP) in a CPU?',
+    options: [
+        { value: 'a', text: 'To store the address of the next instruction' },
+        { value: 'b', text: 'To point to the top of the stack in memory' },
+        { value: 'c', text: 'To manage the cache memory' },
+        { value: 'd', text: 'To control the flow of data between the CPU and peripherals' }
+    ],
+    correct: 'b',
+    explanation: 'The Stack Pointer (SP) points to the top of the stack in memory, which is used for managing function calls and local variables.'
+},
+{
+    id: 'q102',
+    text: 'Which of the following is true about the Harvard architecture?',
+    options: [
+        { value: 'a', text: 'It uses a single bus for both data and instructions' },
+        { value: 'b', text: 'It separates the memory for data and instructions' },
+        { value: 'c', text: 'It is slower than Von Neumann architecture' },
+        { value: 'd', text: 'It uses a unified cache for data and instructions' }
+    ],
+    correct: 'b',
+    explanation: 'Harvard architecture separates the memory for data and instructions, allowing simultaneous access to both.'
+},
+{
+    id: 'q103',
+    text: 'What is the primary purpose of the Interrupt Vector Table (IVT) in a computer system?',
+    options: [
+        { value: 'a', text: 'To store the addresses of interrupt service routines' },
+        { value: 'b', text: 'To manage the cache memory' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'a',
+    explanation: 'The Interrupt Vector Table (IVT) stores the addresses of interrupt service routines, allowing the CPU to quickly respond to interrupts.'
+},
+{
+    id: 'q104',
+    text: 'Which of the following is a key advantage of using a multi-core processor?',
+    options: [
+        { value: 'a', text: 'It reduces the clock speed of the CPU' },
+        { value: 'b', text: 'It allows multiple tasks to be executed in parallel' },
+        { value: 'c', text: 'It increases the size of the cache memory' },
+        { value: 'd', text: 'It reduces the power consumption of the CPU' }
+    ],
+    correct: 'b',
+    explanation: 'A multi-core processor allows multiple tasks to be executed in parallel, improving overall system performance.'
+},
+{
+    id: 'q105',
+    text: 'What is the primary function of the Direct Memory Access (DMA) controller?',
+    options: [
+        { value: 'a', text: 'To manage the cache memory' },
+        { value: 'b', text: 'To allow peripherals to access memory directly without CPU intervention' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The DMA controller allows peripherals to access memory directly without CPU intervention, reducing the CPU’s workload.'
+},
+{
+    id: 'q106',
+    text: 'Which of the following is true about the Von Neumann architecture?',
+    options: [
+        { value: 'a', text: 'It uses separate buses for data and instructions' },
+        { value: 'b', text: 'It stores data and instructions in the same memory' },
+        { value: 'c', text: 'It is slower than Harvard architecture' },
+        { value: 'd', text: 'It uses a unified cache for data and instructions' }
+    ],
+    correct: 'b',
+    explanation: 'Von Neumann architecture stores data and instructions in the same memory, using a single bus for both.'
+},
+{
+    id: 'q107',
+    text: 'What is the primary purpose of the Memory Management Unit (MMU) in a computer system?',
+    options: [
+        { value: 'a', text: 'To manage the cache memory' },
+        { value: 'b', text: 'To translate virtual addresses to physical addresses' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The Memory Management Unit (MMU) translates virtual addresses to physical addresses, enabling virtual memory management.'
+},
+{
+    id: 'q108',
+    text: 'Which of the following is a key feature of superscalar architecture?',
+    options: [
+        { value: 'a', text: 'It executes multiple instructions per clock cycle' },
+        { value: 'b', text: 'It reduces the number of instructions executed per clock cycle' },
+        { value: 'c', text: 'It increases the complexity of the instruction set' },
+        { value: 'd', text: 'It reduces the size of the cache memory' }
+    ],
+    correct: 'a',
+    explanation: 'Superscalar architecture allows the CPU to execute multiple instructions per clock cycle, improving performance.'
+},
+{
+    id: 'q109',
+    text: 'What is the primary function of the Branch Predictor in a CPU?',
+    options: [
+        { value: 'a', text: 'To manage the cache memory' },
+        { value: 'b', text: 'To predict the outcome of conditional branches' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The Branch Predictor predicts the outcome of conditional branches, allowing the CPU to prefetch instructions and reduce pipeline stalls.'
+},
+{
+    id: 'q110',
+    text: 'Which of the following is true about the Flynn’s taxonomy classification of computer architectures?',
+    options: [
+        { value: 'a', text: 'It classifies architectures based on their power consumption' },
+        { value: 'b', text: 'It classifies architectures based on the number of instruction and data streams' },
+        { value: 'c', text: 'It classifies architectures based on their clock speed' },
+        { value: 'd', text: 'It classifies architectures based on their cache size' }
+    ],
+    correct: 'b',
+    explanation: 'Flynn’s taxonomy classifies computer architectures based on the number of instruction and data streams, such as SISD, SIMD, MISD, and MIMD.'
+},
+{
+    id: 'q111',
+    text: 'What is the primary purpose of the Page Table in a computer system?',
+    options: [
+        { value: 'a', text: 'To manage the cache memory' },
+        { value: 'b', text: 'To map virtual addresses to physical addresses' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The Page Table maps virtual addresses to physical addresses, enabling virtual memory management.'
+},
+{
+    id: 'q112',
+    text: 'Which of the following is a key advantage of using a multi-threaded processor?',
+    options: [
+        { value: 'a', text: 'It reduces the clock speed of the CPU' },
+        { value: 'b', text: 'It allows multiple threads to be executed concurrently' },
+        { value: 'c', text: 'It increases the size of the cache memory' },
+        { value: 'd', text: 'It reduces the power consumption of the CPU' }
+    ],
+    correct: 'b',
+    explanation: 'A multi-threaded processor allows multiple threads to be executed concurrently, improving performance for multi-threaded applications.'
+},
+{
+    id: 'q113',
+    text: 'What is the primary function of the Floating-Point Unit (FPU) in a CPU?',
+    options: [
+        { value: 'a', text: 'To manage the cache memory' },
+        { value: 'b', text: 'To perform arithmetic operations on floating-point numbers' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The Floating-Point Unit (FPU) performs arithmetic operations on floating-point numbers, which are used for scientific and graphical computations.'
+},
+{
+    id: 'q114',
+    text: 'Which of the following is true about the concept of "out-of-order execution" in modern CPUs?',
+    options: [
+        { value: 'a', text: 'It executes instructions in the exact order they are fetched' },
+        { value: 'b', text: 'It reorders instructions to improve performance' },
+        { value: 'c', text: 'It reduces the number of instructions executed per clock cycle' },
+        { value: 'd', text: 'It increases the complexity of the instruction set' }
+    ],
+    correct: 'b',
+    explanation: 'Out-of-order execution allows the CPU to reorder instructions to improve performance by executing independent instructions in parallel.'
+},
+{
+    id: 'q115',
+    text: 'What is the primary purpose of the Translation Lookaside Buffer (TLB) in a CPU?',
+    options: [
+        { value: 'a', text: 'To store the results of arithmetic operations' },
+        { value: 'b', text: 'To speed up the translation of virtual addresses to physical addresses' },
+        { value: 'c', text: 'To manage the cache memory' },
+        { value: 'd', text: 'To control the flow of data between the CPU and peripherals' }
+    ],
+    correct: 'b',
+    explanation: 'The Translation Lookaside Buffer (TLB) speeds up the translation of virtual addresses to physical addresses, improving memory access times.'
+},
+{
+    id: 'q116',
+    text: 'Which of the following is a key feature of the Reduced Instruction Set Computing (RISC) architecture?',
+    options: [
+        { value: 'a', text: 'Complex instructions that perform multiple operations' },
+        { value: 'b', text: 'A large number of instructions' },
+        { value: 'c', text: 'Simple instructions that execute in a single clock cycle' },
+        { value: 'd', text: 'High power consumption' }
+    ],
+    correct: 'c',
+    explanation: 'RISC architecture uses simple instructions that can be executed in a single clock cycle, leading to faster processing.'
+},
+{
+    id: 'q117',
+    text: 'What is the primary function of the Memory Management Unit (MMU) in a computer system?',
+    options: [
+        { value: 'a', text: 'To manage the cache memory' },
+        { value: 'b', text: 'To translate virtual addresses to physical addresses' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'b',
+    explanation: 'The Memory Management Unit (MMU) translates virtual addresses to physical addresses, enabling virtual memory management.'
+},
+{
+    id: 'q118',
+    text: 'Which of the following is true about the concept of "pipelining" in CPU architecture?',
+    options: [
+        { value: 'a', text: 'It reduces the number of instructions executed per clock cycle' },
+        { value: 'b', text: 'It allows multiple instructions to be processed simultaneously' },
+        { value: 'c', text: 'It increases the complexity of the instruction set' },
+        { value: 'd', text: 'It reduces the size of the cache memory' }
+    ],
+    correct: 'b',
+    explanation: 'Pipelining allows multiple instructions to be processed simultaneously by dividing the execution process into stages.'
+},
+{
+    id: 'q119',
+    text: 'What is the primary purpose of the Interrupt Vector Table (IVT) in a computer system?',
+    options: [
+        { value: 'a', text: 'To store the addresses of interrupt service routines' },
+        { value: 'b', text: 'To manage the cache memory' },
+        { value: 'c', text: 'To control the flow of data between the CPU and peripherals' },
+        { value: 'd', text: 'To store the results of arithmetic operations' }
+    ],
+    correct: 'a',
+    explanation: 'The Interrupt Vector Table (IVT) stores the addresses of interrupt service routines, allowing the CPU to quickly respond to interrupts.'
+},
+{
+    id: 'q120',
+    text: 'Which of the following is a key advantage of using a multi-core processor?',
+    options: [
+        { value: 'a', text: 'It reduces the clock speed of the CPU' },
+        { value: 'b', text: 'It allows multiple tasks to be executed in parallel' },
+        { value: 'c', text: 'It increases the size of the cache memory' },
+        { value: 'd', text: 'It reduces the power consumption of the CPU' }
+    ],
+    correct: 'b',
+    explanation: 'A multi-core processor allows multiple tasks to be executed in parallel, improving overall system performance.'
+},
+{
+        "id": "q121",
+        "text": "Which of the following is NOT a type of cache memory?",
+        "options": [
+            { "value": "a", text: "Level 1 (L1) cache" },
+            { "value": "b", text: "Level 2 (L2) cache" },
+            { "value": "c", text: "Level 3 (L3) cache" },
+            { "value": "d", text: "Level 4 (L4) cache" }
+        ],
+        "correct": "d",
+        "explanation": "Level 4 (L4) cache is not a standard type of cache memory. The standard levels are L1, L2, and L3."
+    },
+    {
+        "id": "q122",
+        "text": "Cache memory is typically faster than main memory. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Cache memory is designed to be faster than main memory to speed up CPU access to frequently used data."
+    },
+    {
+        "id": "q123",
+        "text": "Which of the following is a characteristic of secondary memory?",
+        "options": [
+            { "value": "a", text: "Volatile" },
+            { "value": "b", text: "Faster than primary memory" },
+            { "value": "c", text: "Non-volatile" },
+            { "value": "d", text: "Directly accessed by the CPU" }
+        ],
+        "correct": "c",
+        "explanation": "Secondary memory is non-volatile, meaning it retains data even when the power is turned off."
+    },
+    {
+        "id": "q124",
+        "text": "The memory hierarchy is designed to balance which of the following?",
+        "options": [
+            { "value": "a", text: "Cost, capacity, and access time" },
+            { "value": "b", text: "Speed, power consumption, and size" },
+            { "value": "c", text: "Capacity, speed, and power consumption" },
+            { "value": "d", text: "Access time, cost, and power consumption" }
+        ],
+        "correct": "a",
+        "explanation": "The memory hierarchy balances cost, capacity, and access time to optimize overall system performance."
+    },
+    {
+        "id": "q125",
+        "text": "Which of the following is true about the L1 cache?",
+        "options": [
+            { "value": "a", text: "It is the largest cache memory" },
+            { "value": "b", text: "It is the slowest cache memory" },
+            { "value": "c", text: "It is the fastest cache memory" },
+            { "value": "d", text: "It is located on the motherboard" }
+        ],
+        "correct": "c",
+        "explanation": "L1 cache is the fastest cache memory, located closest to the CPU for quick access."
+    },
+    {
+        "id": "q126",
+        "text": "The unit of transfer for external memory is typically a block. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "External memory often transfers data in larger units called blocks, rather than individual words."
+    },
+    {
+        "id": "q127",
+        "text": "Which of the following is NOT a characteristic of primary memory?",
+        "options": [
+            { "value": "a", text: "Volatile" },
+            { "value": "b", text: "Limited capacity" },
+            { "value": "c", text: "Non-volatile" },
+            { "value": "d", text: "Directly accessed by the CPU" }
+        ],
+        "correct": "c",
+        "explanation": "Primary memory is volatile, meaning it loses data when power is turned off. Non-volatile memory is a characteristic of secondary memory."
+    },
+    {
+        "id": "q128",
+        "text": "The hit ratio in cache memory refers to the percentage of times the CPU finds the data it needs in the cache. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The hit ratio measures how often the CPU finds the required data in the cache, indicating cache efficiency."
+    },
+    {
+        "id": "q129",
+        "text": "Which of the following is a disadvantage of using cache memory?",
+        "options": [
+            { "value": "a", text: "It increases the access time of the CPU" },
+            { "value": "b", text: "It is more expensive than main memory" },
+            { "value": "c", text: "It reduces the overall system performance" },
+            { "value": "d", text: "It is slower than secondary memory" }
+        ],
+        "correct": "b",
+        "explanation": "Cache memory is more expensive than main memory due to its high-speed design and proximity to the CPU."
+    },
+    {
+        "id": "q130",
+        "text": "The L3 cache is typically larger but slower than the L1 and L2 caches. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L3 cache is larger in size but slower in access time compared to the L1 and L2 caches."
+    },
+    {
+        "id": "q131",
+        "text": "Which of the following is a key advantage of using a multi-core processor?",
+        "options": [
+            { "value": "a", text: "It reduces the clock speed of the CPU" },
+            { "value": "b", text: "It allows multiple tasks to be executed in parallel" },
+            { "value": "c", text: "It increases the size of the cache memory" },
+            { "value": "d", text: "It reduces the power consumption of the CPU" }
+        ],
+        "correct": "b",
+        "explanation": "A multi-core processor allows multiple tasks to be executed in parallel, improving overall system performance."
+    },
+    {
+        "id": "q132",
+        "text": "Which of the following is NOT a type of memory in the memory hierarchy?",
+        "options": [
+            { "value": "a", text: "Cache memory" },
+            { "value": "b", text: "Primary memory" },
+            { "value": "c", text: "Secondary memory" },
+            { "value": "d", text: "Tertiary memory" }
+        ],
+        "correct": "d",
+        "explanation": "Tertiary memory is not a standard level in the memory hierarchy, which typically includes cache, primary, and secondary memory."
+    },
+    {
+        "id": "q133",
+        "text": "The access time of cache memory is generally slower than that of main memory. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "Cache memory is designed to have faster access times than main memory to speed up CPU operations."
+    },
+    {
+        "id": "q134",
+        "text": "Which of the following is a characteristic of a memory hierarchy?",
+        "options": [
+            { "value": "a", text: "Decreasing cost per bit" },
+            { "value": "b", text: "Increasing access time" },
+            { "value": "c", text: "Decreasing capacity" },
+            { "value": "d", text: "Increasing frequency of access" }
+        ],
+        "correct": "a",
+        "explanation": "A memory hierarchy is designed to decrease cost per bit while balancing capacity and access time."
+    },
+    {
+        "id": "q135",
+        "text": "The L2 cache is typically located on the CPU die. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L2 cache is usually located on the CPU die, making it faster than the L3 cache but slower than the L1 cache."
+    },
+    {
+        "id": "q136",
+        "text": "Which of the following is a disadvantage of using secondary memory?",
+        "options": [
+            { "value": "a", text: "It is volatile" },
+            { "value": "b", text: "It is slower than primary memory" },
+            { "value": "c", text: "It is more expensive than cache memory" },
+            { "value": "d", text: "It is directly accessed by the CPU" }
+        ],
+        "correct": "b",
+        "explanation": "Secondary memory is slower than primary memory, which is why data is first transferred to main memory before being accessed by the CPU."
+    },
+    {
+        "id": "q137",
+        "text": "The L1 cache is typically smaller in size compared to the L2 and L3 caches. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L1 cache is the smallest but fastest cache, while the L2 and L3 caches are larger but slower."
+    },
+    {
+        "id": "q138",
+        "text": "Which of the following is a key characteristic of cache memory?",
+        "options": [
+            { "value": "a", text: "It is non-volatile" },
+            { "value": "b", text: "It is slower than main memory" },
+            { "value": "c", text: "It is volatile" },
+            { "value": "d", text: "It is directly accessed by the CPU" }
+        ],
+        "correct": "c",
+        "explanation": "Cache memory is volatile, meaning it loses data when power is turned off, but it is faster than main memory."
+    },
+    {
+        "id": "q139",
+        "text": "The L3 cache is typically shared among multiple CPU cores. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L3 cache is often shared among multiple CPU cores to improve data sharing and reduce latency."
+    },
+    {
+        "id": "q140",
+        "text": "Which of the following is a key advantage of using a memory hierarchy?",
+        "options": [
+            { "value": "a", text: "It reduces the overall cost of memory" },
+            { "value": "b", text: "It increases the access time of memory" },
+            { "value": "c", text: "It reduces the capacity of memory" },
+            { "value": "d", text: "It increases the power consumption of memory" }
+        ],
+        "correct": "a",
+        "explanation": "A memory hierarchy reduces the overall cost of memory by balancing cost, capacity, and access time."
+    },
+    {
+        "id": "q141",
+        "text": "The L2 cache is typically larger than the L1 cache but smaller than the L3 cache. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L2 cache is larger than the L1 cache but smaller than the L3 cache, balancing speed and capacity."
+    },
+    {
+        "id": "q142",
+        "text": "Which of the following is a characteristic of primary memory?",
+        "options": [
+            { "value": "a", text: "It is non-volatile" },
+            { "value": "b", text: "It is slower than secondary memory" },
+            { "value": "c", text: "It is directly accessed by the CPU" },
+            { "value": "d", text: "It is used for long-term storage" }
+        ],
+        "correct": "c",
+        "explanation": "Primary memory is directly accessed by the CPU and is used for temporary storage of data and instructions."
+    },
+    {
+        "id": "q143",
+        "text": "The L3 cache is typically faster than the L1 cache. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The L3 cache is slower than the L1 cache, which is the fastest cache memory in the hierarchy."
+    },
+    {
+        "id": "q144",
+        "text": "Which of the following is a key disadvantage of using cache memory?",
+        "options": [
+            { "value": "a", text: "It is more expensive than main memory" },
+            { "value": "b", text: "It is slower than secondary memory" },
+            { "value": "c", text: "It reduces the overall system performance" },
+            { "value": "d", text: "It increases the access time of the CPU" }
+        ],
+        "correct": "a",
+        "explanation": "Cache memory is more expensive than main memory due to its high-speed design and proximity to the CPU."
+    },
+    {
+        "id": "q145",
+        "text": "The L1 cache is typically shared among multiple CPU cores. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The L1 cache is typically dedicated to each CPU core, providing the fastest access to frequently used data."
+    },
+    {
+        "id": "q146",
+        "text": "Which of the following is a key advantage of using secondary memory?",
+        "options": [
+            { "value": "a", text: "It is faster than primary memory" },
+            { "value": "b", text: "It is non-volatile" },
+            { "value": "c", text: "It is directly accessed by the CPU" },
+            { "value": "d", text: "It is more expensive than cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "Secondary memory is non-volatile, meaning it retains data even when the power is turned off, making it ideal for long-term storage."
+    },
+    {
+        "id": "q147",
+        "text": "The L2 cache is typically slower than the L1 cache but faster than the L3 cache. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L2 cache is slower than the L1 cache but faster than the L3 cache, balancing speed and capacity."
+    },
+    {
+        "id": "q148",
+        "text": "Which of the following is a key characteristic of secondary memory?",
+        "options": [
+            { "value": "a", text: "It is volatile" },
+            { "value": "b", text: "It is faster than primary memory" },
+            { "value": "c", text: "It is non-volatile" },
+            { "value": "d", text: "It is directly accessed by the CPU" }
+        ],
+        "correct": "c",
+        "explanation": "Secondary memory is non-volatile, meaning it retains data even when the power is turned off, making it ideal for long-term storage."
+    },
+    {
+        "id": "q149",
+        "text": "The L3 cache is typically located on the motherboard. (True/False)",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The L3 cache is typically located on the CPU die, not on the motherboard, to reduce latency and improve performance."
+    },
+    {
+        "id": "q150",
+        "text": "Which of the following is a key advantage of using primary memory?",
+        "options": [
+            { "value": "a", text: "It is non-volatile" },
+            { "value": "b", text: "It is directly accessed by the CPU" },
+            { "value": "c", text: "It is slower than secondary memory" },
+            { "value": "d", text: "It is used for long-term storage" }
+        ],
+        "correct": "b",
+        "explanation": "Primary memory is directly accessed by the CPU, allowing for fast data retrieval and processing."
+    },
+    {
+        "id": "q151",
+        "text": "Which of the following is NOT a type of cache mapping?",
+        "options": [
+            { "value": "a", text: "Direct Mapping" },
+            { "value": "b", text: "Associative Mapping" },
+            { "value": "c", text: "Set-Associative Mapping" },
+            { "value": "d", text: "Linear Mapping" }
+        ],
+        "correct": "d",
+        "explanation": "Linear Mapping is not a type of cache mapping. The common types are Direct, Associative, and Set-Associative Mapping."
+    },
+    {
+        "id": "q152",
+        "text": "In a direct-mapped cache, each block of main memory maps to exactly one cache line.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In direct mapping, each block of main memory maps to only one specific cache line."
+    },
+    {
+        "id": "q153",
+        "text": "Which of the following is a disadvantage of a fully associative cache?",
+        "options": [
+            { "value": "a", text: "It has a higher hit rate compared to direct mapping" },
+            { "value": "b", text: "It requires more complex hardware for searching" },
+            { "value": "c", text: "It is slower than direct mapping" },
+            { "value": "d", text: "It has a lower hit rate compared to set-associative mapping" }
+        ],
+        "correct": "b",
+        "explanation": "Fully associative caches require more complex hardware for searching because any block can be placed in any cache line."
+    },
+    {
+        "id": "q154",
+        "text": "The Translation Lookaside Buffer (TLB) is used to speed up the translation of virtual addresses to physical addresses.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The TLB is a cache that stores recent translations of virtual addresses to physical addresses, speeding up the process."
+    },
+    {
+        "id": "q155",
+        "text": "Which of the following is true about the Least Recently Used (LRU) replacement algorithm?",
+        "options": [
+            { "value": "a", text: "It replaces the block that has been used most recently" },
+            { "value": "b", text: "It replaces the block that has been used least recently" },
+            { "value": "c", text: "It replaces a random block" },
+            { "value": "d", text: "It replaces the block that has been used most frequently" }
+        ],
+        "correct": "b",
+        "explanation": "The LRU algorithm replaces the block that has been used least recently."
+    },
+    {
+        "id": "q156",
+        "text": "In a multi-level cache hierarchy, the L1 cache is typically faster but smaller than the L2 cache.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The L1 cache is usually faster but smaller than the L2 cache, which is larger but slower."
+    },
+    {
+        "id": "q157",
+        "text": "Which of the following is a key advantage of using a write-through cache policy?",
+        "options": [
+            { "value": "a", text: "It reduces the number of writes to main memory" },
+            { "value": "b", text: "It ensures that the cache and main memory are always consistent" },
+            { "value": "c", text: "It reduces the latency of write operations" },
+            { "value": "d", text: "It increases the hit rate of the cache" }
+        ],
+        "correct": "b",
+        "explanation": "The write-through policy ensures that the cache and main memory are always consistent by writing data to both simultaneously."
+    },
+    {
+        "id": "q158",
+        "text": "The hit rate of a cache is defined as the percentage of memory accesses that are found in the cache.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The hit rate is the percentage of memory accesses that result in a cache hit, meaning the data was found in the cache."
+    },
+    {
+        "id": "q159",
+        "text": "Which of the following is a disadvantage of using a write-back cache policy?",
+        "options": [
+            { "value": "a", text: "It increases the number of writes to main memory" },
+            { "value": "b", text: "It can lead to inconsistency between the cache and main memory" },
+            { "value": "c", text: "It reduces the hit rate of the cache" },
+            { "value": "d", text: "It increases the latency of write operations" }
+        ],
+        "correct": "b",
+        "explanation": "The write-back policy can lead to inconsistency between the cache and main memory because data is only written to main memory when the cache block is replaced."
+    },
+    {
+        "id": "q160",
+        "text": "In a set-associative cache, each block of main memory can be mapped to any cache line within a specific set.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In set-associative mapping, each block of main memory can be mapped to any cache line within a specific set, which is a compromise between direct and fully associative mapping."
+    },
+    {
+        "id": "q161",
+        "text": "Which of the following is true about the First In First Out (FIFO) replacement algorithm?",
+        "options": [
+            { "value": "a", text: "It replaces the block that has been used least recently" },
+            { "value": "b", text: "It replaces the block that has been in the cache the longest" },
+            { "value": "c", text: "It replaces a random block" },
+            { "value": "d", text: "It replaces the block that has been used most frequently" }
+        ],
+        "correct": "b",
+        "explanation": "The FIFO algorithm replaces the block that has been in the cache the longest, regardless of how recently it was used."
+    },
+    {
+        "id": "q162",
+        "text": "The size of the cache is typically much larger than the size of main memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The cache is typically much smaller than main memory, as it is designed to store only the most frequently accessed data."
+    },
+    {
+        "id": "q163",
+        "text": "Which of the following is a key advantage of using a multi-level cache hierarchy?",
+        "options": [
+            { "value": "a", text: "It reduces the overall cost of the memory system" },
+            { "value": "b", text: "It reduces the latency of memory accesses" },
+            { "value": "c", text: "It increases the size of the main memory" },
+            { "value": "d", text: "It reduces the power consumption of the CPU" }
+        ],
+        "correct": "b",
+        "explanation": "A multi-level cache hierarchy reduces the latency of memory accesses by providing faster access to frequently used data."
+    },
+    {
+        "id": "q164",
+        "text": "The cache line size is typically smaller than the block size in main memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The cache line size is typically the same as the block size in main memory, as each cache line stores one block of data."
+    },
+    {
+        "id": "q165",
+        "text": "Which of the following is true about the Least Frequently Used (LFU) replacement algorithm?",
+        "options": [
+            { "value": "a", text: "It replaces the block that has been used most recently" },
+            { "value": "b", text: "It replaces the block that has been used least frequently" },
+            { "value": "c", text: "It replaces a random block" },
+            { "value": "d", text: "It replaces the block that has been in the cache the longest" }
+        ],
+        "correct": "b",
+        "explanation": "The LFU algorithm replaces the block that has been used least frequently."
+    },
+    {
+        "id": "q166",
+        "text": "In a fully associative cache, any block of main memory can be placed in any cache line.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In a fully associative cache, any block of main memory can be placed in any cache line, providing maximum flexibility but requiring more complex hardware."
+    },
+    {
+        "id": "q167",
+        "text": "Which of the following is a disadvantage of using a direct-mapped cache?",
+        "options": [
+            { "value": "a", text: "It has a higher hit rate compared to fully associative mapping" },
+            { "value": "b", text: "It can lead to more cache conflicts" },
+            { "value": "c", text: "It requires more complex hardware for searching" },
+            { "value": "d", text: "It is slower than fully associative mapping" }
+        ],
+        "correct": "b",
+        "explanation": "Direct-mapped caches can lead to more cache conflicts because each block of main memory can only map to one specific cache line."
+    },
+    {
+        "id": "q168",
+        "text": "The cache hit rate is inversely proportional to the cache miss rate.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The cache hit rate and miss rate are inversely proportional; as the hit rate increases, the miss rate decreases, and vice versa."
+    },
+    {
+        "id": "q169",
+        "text": "Which of the following is true about the random replacement algorithm?",
+        "options": [
+            { "value": "a", text: "It replaces the block that has been used least recently" },
+            { "value": "b", text: "It replaces a random block" },
+            { "value": "c", text: "It replaces the block that has been used most frequently" },
+            { "value": "d", text: "It replaces the block that has been in the cache the longest" }
+        ],
+        "correct": "b",
+        "explanation": "The random replacement algorithm replaces a randomly selected block, which is simple to implement but may not be optimal."
+    },
+    {
+        "id": "q170",
+        "text": "In a multi-level cache hierarchy, the L3 cache is typically larger but slower than the L2 cache.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In a multi-level cache hierarchy, the L3 cache is typically larger but slower than the L2 cache, which is smaller but faster."
+    },
+    {
+        "id": "q171",
+        "text": "Which of the following is a key advantage of using a write-back cache policy?",
+        "options": [
+            { "value": "a", text: "It reduces the number of writes to main memory" },
+            { "value": "b", text: "It ensures that the cache and main memory are always consistent" },
+            { "value": "c", text: "It reduces the latency of write operations" },
+            { "value": "d", text: "It increases the hit rate of the cache" }
+        ],
+        "correct": "a",
+        "explanation": "The write-back policy reduces the number of writes to main memory by only writing data back when a cache block is replaced."
+    },
+    {
+        "id": "q172",
+        "text": "The cache miss penalty is the time required to fetch data from main memory when a cache miss occurs.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The cache miss penalty is the additional time required to fetch data from main memory when a cache miss occurs."
+    },
+    {
+        "id": "q173",
+        "text": "Which of the following is true about the cache line size?",
+        "options": [
+            { "value": "a", text: "A larger cache line size can reduce the number of cache misses" },
+            { "value": "b", text: "A smaller cache line size can reduce the number of cache conflicts" },
+            { "value": "c", text: "A larger cache line size can increase the cache hit rate" },
+            { "value": "d", text: "A smaller cache line size can increase the cache miss rate" }
+        ],
+        "correct": "a",
+        "explanation": "A larger cache line size can reduce the number of cache misses by allowing more data to be loaded into the cache at once."
+    },
+    {
+        "id": "q174",
+        "text": "In a set-associative cache, the number of cache lines per set is determined by the associativity level.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In a set-associative cache, the number of cache lines per set is determined by the associativity level, which is the number of cache lines in each set."
+    },
+    {
+        "id": "q175",
+        "text": "Which of the following is true about the cache replacement policy?",
+        "options": [
+            { "value": "a", text: "It determines which block to replace when a cache miss occurs" },
+            { "value": "b", text: "It determines which block to replace when a cache hit occurs" },
+            { "value": "c", text: "It determines the size of the cache" },
+            { "value": "d", text: "It determines the associativity level of the cache" }
+        ],
+        "correct": "a",
+        "explanation": "The cache replacement policy determines which block to replace when a cache miss occurs and a new block needs to be loaded into the cache."
+    },
+    {
+        "id": "q176",
+        "text": "The cache hit time is the time required to access data in the cache when a cache hit occurs.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The cache hit time is the time required to access data in the cache when a cache hit occurs, which is typically much faster than accessing main memory."
+    },
+    {
+        "id": "q177",
+        "text": "Which of the following is a key advantage of using a write-allocate cache policy?",
+        "options": [
+            { "value": "a", text: "It reduces the number of writes to main memory" },
+            { "value": "b", text: "It ensures that the cache and main memory are always consistent" },
+            { "value": "c", text: "It reduces the latency of write operations" },
+            { "value": "d", text: "It increases the hit rate of the cache" }
+        ],
+        "correct": "d",
+        "explanation": "The write-allocate policy increases the hit rate of the cache by loading the block into the cache on a write miss, allowing future writes to be handled by the cache."
+    },
+    {
+        "id": "q178",
+        "text": "The cache miss rate is the percentage of memory accesses that result in a cache miss.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The cache miss rate is the percentage of memory accesses that result in a cache miss, meaning the data was not found in the cache."
+    },
+    {
+        "id": "q179",
+        "text": "Which of the following is true about the cache associativity level?",
+        "options": [
+            { "value": "a", text: "A higher associativity level can reduce the number of cache conflicts" },
+            { "value": "b", text: "A lower associativity level can reduce the cache hit rate" },
+            { "value": "c", text: "A higher associativity level can increase the cache miss rate" },
+            { "value": "d", text: "A lower associativity level can increase the cache hit time" }
+        ],
+        "correct": "a",
+        "explanation": "A higher associativity level can reduce the number of cache conflicts by allowing more flexibility in where blocks can be placed in the cache."
+    },
+    {
+        "id": "q180",
+        "text": "In a multi-level cache hierarchy, the L1 cache is typically smaller but faster than the L2 cache.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In a multi-level cache hierarchy, the L1 cache is typically smaller but faster than the L2 cache, which is larger but slower."
+    },
+    {
+        "id": "q181",
+        "text": "In a 2-way set associative cache, how many lines can a given block map to within a set?",
+        "options": [
+            { "value": "a", "text": "1" },
+            { "value": "b", "text": "2" },
+            { "value": "c", "text": "4" },
+            { "value": "d", "text": "Unlimited" }
+        ],
+        "correct": "b",
+        "explanation": "In a 2-way set associative cache, a given block can map to any of the 2 lines within a specific set."
+    },
+    {
+        "id": "q182",
+        "text": "Which of the following is true about write-through cache policy?",
+        "options": [
+            { "value": "a", "text": "Writes are made only to the cache" },
+            { "value": "b", "text": "Writes are made to both the cache and main memory" },
+            { "value": "c", "text": "Writes are made only to main memory" },
+            { "value": "d", "text": "Writes are delayed until the cache line is replaced" }
+        ],
+        "correct": "b",
+        "explanation": "In a write-through cache policy, writes are made to both the cache and main memory simultaneously."
+    },
+    {
+        "id": "q183",
+        "text": "What is the primary purpose of a cache memory in a computer system?",
+        "options": [
+            { "value": "a", "text": "To increase the size of main memory" },
+            { "value": "b", "text": "To reduce the access time to data" },
+            { "value": "c", "text": "To store permanent data" },
+            { "value": "d", "text": "To replace main memory entirely" }
+        ],
+        "correct": "b",
+        "explanation": "The primary purpose of cache memory is to reduce the access time to data by storing frequently accessed data closer to the CPU."
+    },
+    {
+        "id": "q184",
+        "text": "Which of the following cache mapping techniques has the highest flexibility in block placement?",
+        "options": [
+            { "value": "a", "text": "Direct mapping" },
+            { "value": "b", "text": "Set associative mapping" },
+            { "value": "c", "text": "Fully associative mapping" },
+            { "value": "d", "text": "None of the above" }
+        ],
+        "correct": "c",
+        "explanation": "Fully associative mapping allows any block to be placed in any line of the cache, providing the highest flexibility."
+    },
+    {
+        "id": "q185",
+        "text": "What is the main disadvantage of a fully associative cache mapping?",
+        "options": [
+            { "value": "a", "text": "It requires complex hardware for searching" },
+            { "value": "b", "text": "It has a fixed block placement" },
+            { "value": "c", "text": "It is slower than direct mapping" },
+            { "value": "d", "text": "It has a higher miss rate" }
+        ],
+        "correct": "a",
+        "explanation": "Fully associative mapping requires complex hardware to search all cache lines simultaneously, which increases complexity and cost."
+    },
+    {
+        "id": "q186",
+        "text": "Which of the following is a common replacement algorithm used in cache memory?",
+        "options": [
+            { "value": "a", "text": "First-In-First-Out (FIFO)" },
+            { "value": "b", "text": "Last-In-First-Out (LIFO)" },
+            { "value": "c", "text": "Random Replacement" },
+            { "value": "d", "text": "Both a and c" }
+        ],
+        "correct": "d",
+        "explanation": "Common replacement algorithms in cache memory include FIFO and Random Replacement."
+    },
+    {
+        "id": "q187",
+        "text": "In a write-back cache policy, when is the main memory updated?",
+        "options": [
+            { "value": "a", "text": "Immediately when the cache is written" },
+            { "value": "b", "text": "Only when the cache line is replaced" },
+            { "value": "c", "text": "After a fixed time interval" },
+            { "value": "d", "text": "Never" }
+        ],
+        "correct": "b",
+        "explanation": "In a write-back cache policy, the main memory is updated only when the cache line is replaced."
+    },
+    {
+        "id": "q188",
+        "text": "Which of the following is true about the Least Recently Used (LRU) replacement algorithm?",
+        "options": [
+            { "value": "a", "text": "It replaces the most recently used block" },
+            { "value": "b", "text": "It replaces the least recently used block" },
+            { "value": "c", "text": "It replaces a random block" },
+            { "value": "d", "text": "It replaces the first block in the cache" }
+        ],
+        "correct": "b",
+        "explanation": "The LRU replacement algorithm replaces the least recently used block in the cache."
+    },
+    {
+        "id": "q189",
+        "text": "What is the primary advantage of using a split cache architecture?",
+        "options": [
+            { "value": "a", "text": "Higher hit rate" },
+            { "value": "b", "text": "Eliminates cache contention between instruction fetch and data access" },
+            { "value": "c", "text": "Simpler design" },
+            { "value": "d", "text": "Lower power consumption" }
+        ],
+        "correct": "b",
+        "explanation": "A split cache architecture eliminates cache contention between instruction fetch and data access, which is important in pipelining."
+    },
+    {
+        "id": "q190",
+        "text": "Which of the following is a disadvantage of a unified cache architecture?",
+        "options": [
+            { "value": "a", "text": "Lower hit rate" },
+            { "value": "b", "text": "Cache contention between instruction fetch and data access" },
+            { "value": "c", "text": "Higher power consumption" },
+            { "value": "d", "text": "More complex design" }
+        ],
+        "correct": "b",
+        "explanation": "A unified cache architecture can suffer from cache contention between instruction fetch and data access."
+    },
+    {
+        "id": "q191",
+        "text": "What is the typical size of the L1 cache in modern processors?",
+        "options": [
+            { "value": "a", "text": "1 MB" },
+            { "value": "b", "text": "8 KB to 64 KB" },
+            { "value": "c", "text": "256 KB" },
+            { "value": "d", "text": "512 KB" }
+        ],
+        "correct": "b",
+        "explanation": "The typical size of the L1 cache in modern processors ranges from 8 KB to 64 KB."
+    },
+    {
+        "id": "q192",
+        "text": "Which of the following is true about the L2 cache in modern processors?",
+        "options": [
+            { "value": "a", "text": "It is smaller than the L1 cache" },
+            { "value": "b", "text": "It is faster than the L1 cache" },
+            { "value": "c", "text": "It is larger but slower than the L1 cache" },
+            { "value": "d", "text": "It is not used in modern processors" }
+        ],
+        "correct": "c",
+        "explanation": "The L2 cache is typically larger but slower than the L1 cache in modern processors."
+    },
+    {
+        "id": "q193",
+        "text": "What is the primary purpose of a write buffer in a cache system?",
+        "options": [
+            { "value": "a", "text": "To store data temporarily before writing to main memory" },
+            { "value": "b", "text": "To increase the size of the cache" },
+            { "value": "c", "text": "To replace the cache memory" },
+            { "value": "d", "text": "To reduce the clock speed of the CPU" }
+        ],
+        "correct": "a",
+        "explanation": "A write buffer is used to store data temporarily before writing it to main memory, improving write performance."
+    },
+    {
+        "id": "q194",
+        "text": "Which of the following is true about the ARM cache architecture?",
+        "options": [
+            { "value": "a", "text": "It uses only unified caches" },
+            { "value": "b", "text": "It uses only split caches" },
+            { "value": "c", "text": "It can use both unified and split caches" },
+            { "value": "d", "text": "It does not use cache memory" }
+        ],
+        "correct": "c",
+        "explanation": "ARM cache architecture can use both unified and split caches depending on the specific processor design."
+    },
+    {
+        "id": "q195",
+        "text": "What is the primary advantage of using a multi-level cache hierarchy?",
+        "options": [
+            { "value": "a", "text": "It reduces the size of the cache" },
+            { "value": "b", "text": "It increases the access time to data" },
+            { "value": "c", "text": "It balances speed and size by using smaller, faster caches closer to the CPU" },
+            { "value": "d", "text": "It eliminates the need for main memory" }
+        ],
+        "correct": "c",
+        "explanation": "A multi-level cache hierarchy balances speed and size by using smaller, faster caches closer to the CPU and larger, slower caches further away."
+    },
+    {
+        "id": "q196",
+        "text": "Which of the following is true about the Pentium 4 cache architecture?",
+        "options": [
+            { "value": "a", "text": "It has no L1 cache" },
+            { "value": "b", "text": "It has a unified L1 cache" },
+            { "value": "c", "text": "It has separate L1 caches for data and instructions" },
+            { "value": "d", "text": "It does not use an L2 cache" }
+        ],
+        "correct": "c",
+        "explanation": "The Pentium 4 cache architecture has separate L1 caches for data and instructions."
+    },
+    {
+        "id": "q197",
+        "text": "What is the typical line size in the L1 cache of a Pentium 4 processor?",
+        "options": [
+            { "value": "a", "text": "16 bytes" },
+            { "value": "b", "text": "32 bytes" },
+            { "value": "c", "text": "64 bytes" },
+            { "value": "d", "text": "128 bytes" }
+        ],
+        "correct": "c",
+        "explanation": "The typical line size in the L1 cache of a Pentium 4 processor is 64 bytes."
+    },
+    {
+        "id": "q198",
+        "text": "Which of the following is true about the L3 cache in modern processors?",
+        "options": [
+            { "value": "a", "text": "It is faster than the L1 cache" },
+            { "value": "b", "text": "It is smaller than the L2 cache" },
+            { "value": "c", "text": "It is larger but slower than the L2 cache" },
+            { "value": "d", "text": "It is not used in modern processors" }
+        ],
+        "correct": "c",
+        "explanation": "The L3 cache is typically larger but slower than the L2 cache in modern processors."
+    },
+    {
+        "id": "q199",
+        "text": "What is the primary purpose of the tag field in a cache memory address?",
+        "options": [
+            { "value": "a", "text": "To identify the set in the cache" },
+            { "value": "b", "text": "To identify the block within a set" },
+            { "value": "c", "text": "To identify the word within a block" },
+            { "value": "d", "text": "To identify the cache line" }
+        ],
+        "correct": "b",
+        "explanation": "The tag field in a cache memory address is used to identify the block within a set."
+    },
+    {
+        "id": "q200",
+        "text": "Which of the following is true about the set field in a cache memory address?",
+        "options": [
+            { "value": "a", "text": "It identifies the block within a set" },
+            { "value": "b", "text": "It identifies the set in the cache" },
+            { "value": "c", "text": "It identifies the word within a block" },
+            { "value": "d", "text": "It identifies the cache line" }
+        ],
+        "correct": "b",
+        "explanation": "The set field in a cache memory address is used to identify the set in the cache."
+    },
+    {
+        "id": "q201",
+        "text": "What is the primary purpose of the word field in a cache memory address?",
+        "options": [
+            { "value": "a", "text": "To identify the set in the cache" },
+            { "value": "b", "text": "To identify the block within a set" },
+            { "value": "c", "text": "To identify the word within a block" },
+            { "value": "d", "text": "To identify the cache line" }
+        ],
+        "correct": "c",
+        "explanation": "The word field in a cache memory address is used to identify the word within a block."
+    },
+    {
+        "id": "q202",
+        "text": "Which of the following is true about the cache hit ratio?",
+        "options": [
+            { "value": "a", "text": "It decreases as the cache size increases" },
+            { "value": "b", "text": "It increases as the cache size increases" },
+            { "value": "c", "text": "It is not affected by the cache size" },
+            { "value": "d", "text": "It is always 100%" }
+        ],
+        "correct": "b",
+        "explanation": "The cache hit ratio generally increases as the cache size increases, as more data can be stored in the cache."
+    },
+    {
+        "id": "q203",
+        "text": "What is the primary disadvantage of increasing the associativity of a cache?",
+        "options": [
+            { "value": "a", "text": "It reduces the cache hit ratio" },
+            { "value": "b", "text": "It increases the complexity and cost of the cache" },
+            { "value": "c", "text": "It reduces the cache size" },
+            { "value": "d", "text": "It increases the access time to data" }
+        ],
+        "correct": "b",
+        "explanation": "Increasing the associativity of a cache increases the complexity and cost of the cache due to the need for more complex hardware."
+    },
+    {
+        "id": "q204",
+        "text": "Which of the following is true about the cache miss penalty?",
+        "options": [
+            { "value": "a", "text": "It is the time taken to access data from the cache" },
+            { "value": "b", "text": "It is the time taken to access data from main memory when a cache miss occurs" },
+            { "value": "c", "text": "It is the time taken to replace a cache line" },
+            { "value": "d", "text": "It is the time taken to write data to the cache" }
+        ],
+        "correct": "b",
+        "explanation": "The cache miss penalty is the time taken to access data from main memory when a cache miss occurs."
+    },
+    {
+        "id": "q205",
+        "text": "What is the primary purpose of a cache line replacement policy?",
+        "options": [
+            { "value": "a", "text": "To determine which cache line to replace when a new block is loaded" },
+            { "value": "b", "text": "To increase the size of the cache" },
+            { "value": "c", "text": "To reduce the cache hit ratio" },
+            { "value": "d", "text": "To increase the access time to data" }
+        ],
+        "correct": "a",
+        "explanation": "The primary purpose of a cache line replacement policy is to determine which cache line to replace when a new block is loaded."
+    },
+    {
+        "id": "q206",
+        "text": "Which of the following is true about the cache coherence problem?",
+        "options": [
+            { "value": "a", "text": "It occurs when multiple CPUs have their own caches and may have inconsistent views of memory" },
+            { "value": "b", "text": "It occurs when the cache size is too small" },
+            { "value": "c", "text": "It occurs when the cache hit ratio is too low" },
+            { "value": "d", "text": "It occurs when the cache is too large" }
+        ],
+        "correct": "a",
+        "explanation": "The cache coherence problem occurs when multiple CPUs have their own caches and may have inconsistent views of memory."
+    },
+    {
+        "id": "q207",
+        "text": "What is the primary purpose of a cache coherence protocol?",
+        "options": [
+            { "value": "a", "text": "To increase the cache size" },
+            { "value": "b", "text": "To ensure that all CPUs have a consistent view of memory" },
+            { "value": "c", "text": "To reduce the cache hit ratio" },
+            { "value": "d", "text": "To increase the access time to data" }
+        ],
+        "correct": "b",
+        "explanation": "The primary purpose of a cache coherence protocol is to ensure that all CPUs have a consistent view of memory."
+    },
+    {
+        "id": "q208",
+        "text": "Which of the following is true about the MESI cache coherence protocol?",
+        "options": [
+            { "value": "a", "text": "It is used only in single-core processors" },
+            { "value": "b", "text": "It uses four states: Modified, Exclusive, Shared, and Invalid" },
+            { "value": "c", "text": "It does not support write-back caches" },
+            { "value": "d", "text": "It is not used in modern processors" }
+        ],
+        "correct": "b",
+        "explanation": "The MESI cache coherence protocol uses four states: Modified, Exclusive, Shared, and Invalid."
+    },
+    {
+        "id": "q209",
+        "text": "What is the primary purpose of the Modified state in the MESI protocol?",
+        "options": [
+            { "value": "a", "text": "To indicate that the cache line is invalid" },
+            { "value": "b", "text": "To indicate that the cache line has been modified and is different from main memory" },
+            { "value": "c", "text": "To indicate that the cache line is shared with other caches" },
+            { "value": "d", "text": "To indicate that the cache line is exclusive to this cache" }
+        ],
+        "correct": "b",
+        "explanation": "The Modified state in the MESI protocol indicates that the cache line has been modified and is different from main memory."
+    },
+    {
+        "id": "q210",
+        "text": "Which of the following is true about the Exclusive state in the MESI protocol?",
+        "options": [
+            { "value": "a", "text": "The cache line is shared with other caches" },
+            { "value": "b", "text": "The cache line is invalid" },
+            { "value": "c", "text": "The cache line is exclusive to this cache and matches main memory" },
+            { "value": "d", "text": "The cache line has been modified" }
+        ],
+        "correct": "c",
+        "explanation": "The Exclusive state in the MESI protocol indicates that the cache line is exclusive to this cache and matches main memory."
+    },
+    {
+        "id": "q211",
+        "text": "Which of the following is NOT a function of the I/O module?",
+        "options": [
+            { "value": "a", text: "Control & Timing" },
+            { "value": "b", text: "Data Buffering" },
+            { "value": "c", text: "Error Detection" },
+            { "value": "d", text: "Executing CPU instructions" }
+        ],
+        "correct": "d",
+        "explanation": "The I/O module handles control & timing, data buffering, and error detection, but it does not execute CPU instructions."
+    },
+    {
+        "id": "q212",
+        "text": "In programmed I/O, the CPU waits for the I/O module to complete the operation.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In programmed I/O, the CPU actively waits for the I/O module to complete the operation, which can waste CPU time."
+    },
+    {
+        "id": "q213",
+        "text": "Which of the following is a disadvantage of isolated I/O?",
+        "options": [
+            { "value": "a", text: "It requires special commands for I/O operations" },
+            { "value": "b", text: "It shares the same address space with memory" },
+            { "value": "c", text: "It allows a large selection of memory access commands" },
+            { "value": "d", text: "It simplifies the address decoding process" }
+        ],
+        "correct": "a",
+        "explanation": "Isolated I/O requires special commands for I/O operations, which limits the flexibility compared to memory-mapped I/O."
+    },
+    {
+        "id": "q214",
+        "text": "In interrupt-driven I/O, the CPU does not need to repeatedly check the status of the I/O device.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In interrupt-driven I/O, the I/O module interrupts the CPU when it is ready, eliminating the need for the CPU to repeatedly check the device status."
+    },
+    {
+        "id": "q215",
+        "text": "Which of the following is a key advantage of DMA (Direct Memory Access)?",
+        "options": [
+            { "value": "a", text: "It requires active CPU intervention for data transfer" },
+            { "value": "b", text: "It increases the CPU's workload" },
+            { "value": "c", text: "It allows data transfer without CPU intervention" },
+            { "value": "d", text: "It slows down the data transfer rate" }
+        ],
+        "correct": "c",
+        "explanation": "DMA allows data transfer between memory and I/O devices without CPU intervention, improving efficiency and reducing CPU workload."
+    },
+    {
+        "id": "q216",
+        "text": "In memory-mapped I/O, devices and memory share the same address space.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In memory-mapped I/O, devices and memory share the same address space, allowing I/O operations to be treated like memory read/write operations."
+    },
+    {
+        "id": "q217",
+        "text": "Which of the following is a characteristic of programmed I/O?",
+        "options": [
+            { "value": "a", text: "It is efficient in terms of CPU utilization" },
+            { "value": "b", text: "It requires the CPU to wait for the I/O operation to complete" },
+            { "value": "c", text: "It uses interrupts to notify the CPU" },
+            { "value": "d", text: "It is faster than DMA" }
+        ],
+        "correct": "b",
+        "explanation": "Programmed I/O requires the CPU to wait for the I/O operation to complete, which can lead to inefficient CPU utilization."
+    },
+    {
+        "id": "q218",
+        "text": "The 8259A interrupt controller can handle up to 8 interrupt lines.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The 8259A interrupt controller can handle up to 8 interrupt lines, making it suitable for managing multiple devices."
+    },
+    {
+        "id": "q219",
+        "text": "Which of the following is a function of the I/O module's control and timing?",
+        "options": [
+            { "value": "a", text: "Transferring data between the CPU and memory" },
+            { "value": "b", text: "Coordinating the flow of data between the CPU and I/O devices" },
+            { "value": "c", text: "Executing arithmetic operations" },
+            { "value": "d", text: "Managing the cache memory" }
+        ],
+        "correct": "b",
+        "explanation": "The I/O module's control and timing function coordinates the flow of data between the CPU and I/O devices, ensuring proper synchronization."
+    },
+    {
+        "id": "q220",
+        "text": "In DMA, the CPU is completely idle during data transfer.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "In DMA, the CPU is not completely idle; it can perform other tasks while the DMA controller handles the data transfer."
+    },
+    {
+        "id": "q221",
+        "text": "Which of the following is a disadvantage of interrupt-driven I/O?",
+        "options": [
+            { "value": "a", text: "It requires the CPU to repeatedly check the status of the I/O device" },
+            { "value": "b", text: "It can lead to increased overhead due to frequent interrupts" },
+            { "value": "c", text: "It is slower than programmed I/O" },
+            { "value": "d", text: "It does not allow the CPU to perform other tasks" }
+        ],
+        "correct": "b",
+        "explanation": "Interrupt-driven I/O can lead to increased overhead due to frequent interrupts, especially if multiple devices are generating interrupts."
+    },
+    {
+        "id": "q222",
+        "text": "The 82C55A is a programmable peripheral interface used for I/O operations.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The 82C55A is a programmable peripheral interface that is commonly used for I/O operations, providing flexibility in connecting various devices."
+    },
+    {
+        "id": "q223",
+        "text": "Which of the following is a key feature of DMA?",
+        "options": [
+            { "value": "a", text: "It requires the CPU to handle all data transfers" },
+            { "value": "b", text: "It allows the CPU to perform other tasks while data is being transferred" },
+            { "value": "c", text: "It is slower than programmed I/O" },
+            { "value": "d", text: "It increases the CPU's workload" }
+        ],
+        "correct": "b",
+        "explanation": "A key feature of DMA is that it allows the CPU to perform other tasks while data is being transferred, improving overall system efficiency."
+    },
+    {
+        "id": "q224",
+        "text": "In memory-mapped I/O, special commands are required for I/O operations.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "In memory-mapped I/O, I/O operations are treated like memory read/write operations, so no special commands are required."
+    },
+    {
+        "id": "q225",
+        "text": "Which of the following is a disadvantage of programmed I/O?",
+        "options": [
+            { "value": "a", text: "It is efficient in terms of CPU utilization" },
+            { "value": "b", text: "It requires the CPU to wait for the I/O operation to complete" },
+            { "value": "c", text: "It uses interrupts to notify the CPU" },
+            { "value": "d", text: "It is faster than DMA" }
+        ],
+        "correct": "b",
+        "explanation": "Programmed I/O requires the CPU to wait for the I/O operation to complete, which can lead to inefficient CPU utilization."
+    },
+    {
+        "id": "q226",
+        "text": "The ISA bus can chain two 8259A interrupt controllers together to handle more interrupt lines.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The ISA bus can chain two 8259A interrupt controllers together, allowing for more interrupt lines to be managed."
+    },
+    {
+        "id": "q227",
+        "text": "Which of the following is a function of the I/O module's data buffering?",
+        "options": [
+            { "value": "a", text: "Executing CPU instructions" },
+            { "value": "b", text: "Temporarily storing data during transfer" },
+            { "value": "c", text: "Managing the cache memory" },
+            { "value": "d", text: "Performing arithmetic operations" }
+        ],
+        "correct": "b",
+        "explanation": "The I/O module's data buffering function involves temporarily storing data during transfer to ensure smooth data flow between devices and the CPU."
+    },
+    {
+        "id": "q228",
+        "text": "In DMA, the CPU is responsible for initiating the data transfer.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "In DMA, the CPU is responsible for initiating the data transfer by providing the necessary parameters to the DMA controller."
+    },
+    {
+        "id": "q229",
+        "text": "Which of the following is a key advantage of interrupt-driven I/O?",
+        "options": [
+            { "value": "a", text: "It requires the CPU to repeatedly check the status of the I/O device" },
+            { "value": "b", text: "It allows the CPU to perform other tasks while waiting for I/O operations" },
+            { "value": "c", text: "It is slower than programmed I/O" },
+            { "value": "d", text: "It increases the CPU's workload" }
+        ],
+        "correct": "b",
+        "explanation": "A key advantage of interrupt-driven I/O is that it allows the CPU to perform other tasks while waiting for I/O operations, improving efficiency."
+    },
+    {
+        "id": "q230",
+        "text": "The 82C55A can be used to interface with both keyboards and displays.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The 82C55A is a versatile programmable peripheral interface that can be used to interface with both keyboards and displays."
+    },
+    {
+        "id": "q231",
+        "text": "Which of the following is a disadvantage of DMA?",
+        "options": [
+            { "value": "a", text: "It requires active CPU intervention for data transfer" },
+            { "value": "b", text: "It increases the CPU's workload" },
+            { "value": "c", text: "It can lead to bus contention issues" },
+            { "value": "d", text: "It is slower than programmed I/O" }
+        ],
+        "correct": "c",
+        "explanation": "A disadvantage of DMA is that it can lead to bus contention issues, as both the CPU and DMA controller may need to access the bus simultaneously."
+    },
+    {
+        "id": "q232",
+        "text": "In memory-mapped I/O, I/O devices are accessed using special I/O instructions.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "In memory-mapped I/O, I/O devices are accessed using standard memory read/write instructions, not special I/O instructions."
+    },
+    {
+        "id": "q233",
+        "text": "Which of the following is a key advantage of programmed I/O?",
+        "options": [
+            { "value": "a", text: "It is simple to implement" },
+            { "value": "b", text: "It allows the CPU to perform other tasks while waiting for I/O operations" },
+            { "value": "c", text: "It is faster than DMA" },
+            { "value": "d", text: "It reduces the CPU's workload" }
+        ],
+        "correct": "a",
+        "explanation": "A key advantage of programmed I/O is that it is simple to implement, though it may not be the most efficient in terms of CPU utilization."
+    },
+    {
+        "id": "q234",
+        "text": "The 8259A interrupt controller can prioritize interrupts.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The 8259A interrupt controller can prioritize interrupts, allowing higher-priority interrupts to be serviced before lower-priority ones."
+    },
+    {
+        "id": "q235",
+        "text": "Which of the following is a function of the I/O module's error detection?",
+        "options": [
+            { "value": "a", text: "Executing CPU instructions" },
+            { "value": "b", text: "Detecting and correcting errors in data transfer" },
+            { "value": "c", text: "Managing the cache memory" },
+            { "value": "d", text: "Performing arithmetic operations" }
+        ],
+        "correct": "b",
+        "explanation": "The I/O module's error detection function involves detecting and correcting errors in data transfer to ensure data integrity."
+    },
+    {
+        "id": "q236",
+        "text": "In DMA, the CPU is responsible for transferring data between memory and I/O devices.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "In DMA, the DMA controller is responsible for transferring data between memory and I/O devices, not the CPU."
+    },
+    {
+        "id": "q237",
+        "text": "Which of the following is a key advantage of memory-mapped I/O?",
+        "options": [
+            { "value": "a", text: "It requires special commands for I/O operations" },
+            { "value": "b", text: "It allows a large selection of memory access commands to be used for I/O" },
+            { "value": "c", text: "It increases the complexity of address decoding" },
+            { "value": "d", text: "It reduces the flexibility of I/O operations" }
+        ],
+        "correct": "b",
+        "explanation": "A key advantage of memory-mapped I/O is that it allows a large selection of memory access commands to be used for I/O operations, providing greater flexibility."
+    },
+    {
+        "id": "q238",
+        "text": "The 82C55A can be used to interface with sensors and actuators in robotics applications.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The 82C55A is a versatile programmable peripheral interface that can be used to interface with sensors and actuators in robotics applications."
+    },
+    {
+        "id": "q239",
+        "text": "Which of the following is a disadvantage of interrupt-driven I/O?",
+        "options": [
+            { "value": "a", text: "It requires the CPU to repeatedly check the status of the I/O device" },
+            { "value": "b", text: "It can lead to increased overhead due to frequent interrupts" },
+            { "value": "c", text: "It is slower than programmed I/O" },
+            { "value": "d", text: "It does not allow the CPU to perform other tasks" }
+        ],
+        "correct": "b",
+        "explanation": "Interrupt-driven I/O can lead to increased overhead due to frequent interrupts, especially if multiple devices are generating interrupts."
+    },
+    {
+        "id": "q240",
+        "text": "The 8259A interrupt controller can handle up to 15 interrupt lines when two controllers are chained together.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "When two 8259A interrupt controllers are chained together, they can handle up to 15 interrupt lines, providing greater flexibility in managing multiple devices."
+    },
+    {
+        "id": "q241",
+        "text": "Parallel processing increases the computational speed of a computer system by performing multiple data-processing tasks simultaneously.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Parallel processing allows for simultaneous data-processing tasks, which increases the computational speed of a computer system."
+    },
+    {
+        "id": "q242",
+        "text": "Throughput in parallel processing refers to the number of instructions completed per second.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Throughput is a measure of the amount of data processing that can be accomplished in a given time, often quantified as the number of instructions completed per second."
+    },
+    {
+        "id": "q243",
+        "text": "The main disadvantage of parallel processing is the decrease in hardware cost.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The main disadvantage of parallel processing is the increase in hardware cost due to the need for additional hardware components."
+    },
+    {
+        "id": "q244",
+        "text": "Flynn's classification divides computers into four major groups: SISD, SIMD, MISD, and MIMD.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Flynn's classification categorizes computer architectures into four groups based on the number of instruction and data streams: SISD, SIMD, MISD, and MIMD."
+    },
+    {
+        "id": "q245",
+        "text": "In a pipelined system, the execution of instructions is done sequentially without any overlap.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "In a pipelined system, the execution of instructions is overlapped to improve efficiency and speed, rather than being done sequentially."
+    },
+    {
+        "id": "q246",
+        "text": "A fully pipelined processor can fetch an instruction on every cycle.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "A fully pipelined processor is capable of fetching an instruction on every cycle, which maximizes throughput and efficiency."
+    },
+    {
+        "id": "q247",
+        "text": "Pipeline hazards occur when the expected result of an instruction is problematic due to overlapping execution.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Pipeline hazards occur when the overlapping execution of instructions leads to problematic results, such as data dependencies or resource conflicts."
+    },
+    {
+        "id": "q248",
+        "text": "Structural hazards in pipelining are caused by conflicts over the same resource by different instructions.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Structural hazards occur when multiple instructions attempt to use the same resource simultaneously, leading to conflicts."
+    },
+    {
+        "id": "q249",
+        "text": "Data hazards in pipelining occur when an instruction depends on the result of a previous instruction that has not yet completed.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Data hazards occur when an instruction requires data that is not yet available because a previous instruction has not finished execution."
+    },
+    {
+        "id": "q250",
+        "text": "Control hazards in pipelining are caused by branch instructions that change the flow of execution.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Control hazards occur when the pipeline needs to handle branch instructions, which can change the flow of execution and cause delays."
+    },
+    {
+        "id": "q251",
+        "text": "The Von Neumann architecture uses separate memory for instructions and data.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The Von Neumann architecture uses a unified memory for both instructions and data, which can lead to structural hazards in pipelining."
+    },
+    {
+        "id": "q252",
+        "text": "In a pipelined processor, stalls are used to delay the execution of instructions to resolve hazards.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Stalls are used in pipelined processors to delay the execution of instructions when hazards are detected, allowing time for the hazard to be resolved."
+    },
+    {
+        "id": "q253",
+        "text": "Forwarding and bypassing are techniques used to reduce the impact of data hazards in pipelining.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Forwarding and bypassing are techniques that allow data to be passed directly from one stage of the pipeline to another, reducing the need for stalls and improving performance."
+    },
+    {
+        "id": "q254",
+        "text": "Out-of-order execution is a technique used to improve the performance of pipelined processors by executing instructions as soon as their operands are available.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Out-of-order execution allows a processor to execute instructions in an order that maximizes efficiency, rather than strictly following the program order, which can improve performance."
+    },
+    {
+        "id": "q255",
+        "text": "The instruction fetch stage in a pipelined processor is responsible for decoding the instruction.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The instruction fetch stage is responsible for fetching the instruction from memory, while the decode stage is responsible for decoding the instruction."
+    },
+    {
+        "id": "q256",
+        "text": "The execute stage in a pipelined processor is where arithmetic and logic operations are performed.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The execute stage in a pipelined processor is where arithmetic and logic operations are performed, such as addition, subtraction, and multiplication."
+    },
+    {
+        "id": "q257",
+        "text": "The memory access stage in a pipelined processor is responsible for writing data back to the registers.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The memory access stage is responsible for reading or writing data to memory, while the write-back stage is responsible for writing data back to the registers."
+    },
+    {
+        "id": "q258",
+        "text": "The write-back stage in a pipelined processor is where the results of an instruction are written to the destination register.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The write-back stage is where the results of an instruction, such as the output of an arithmetic operation, are written to the destination register."
+    },
+    {
+        "id": "q259",
+        "text": "In a pipelined processor, the program counter (PC) is updated during the instruction fetch stage.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The program counter (PC) is updated during the instruction fetch stage to point to the next instruction to be executed."
+    },
+    {
+        "id": "q260",
+        "text": "The decode stage in a pipelined processor is responsible for fetching operands from the register file.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "During the decode stage, the processor decodes the instruction and fetches the necessary operands from the register file."
+    },
+    {
+        "id": "q261",
+        "text": "The instruction fetch stage in a pipelined processor is where the instruction is read from memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The instruction fetch stage is where the processor reads the instruction from memory based on the address in the program counter."
+    },
+    {
+        "id": "q262",
+        "text": "The execute stage in a pipelined processor is where the instruction is decoded.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The execute stage is where arithmetic and logic operations are performed, not where the instruction is decoded. Decoding happens in the decode stage."
+    },
+    {
+        "id": "q263",
+        "text": "The memory access stage in a pipelined processor is where data is written to or read from memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The memory access stage is responsible for reading data from memory or writing data to memory, depending on the instruction."
+    },
+    {
+        "id": "q264",
+        "text": "The write-back stage in a pipelined processor is where the results of an instruction are written to memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The write-back stage is where the results of an instruction are written to the destination register, not to memory."
+    },
+    {
+        "id": "q265",
+        "text": "In a pipelined processor, the program counter (PC) is updated during the execute stage.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The program counter (PC) is updated during the instruction fetch stage, not the execute stage."
+    },
+    {
+        "id": "q266",
+        "text": "The decode stage in a pipelined processor is where the instruction is fetched from memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The decode stage is where the instruction is decoded and operands are fetched from the register file, not where the instruction is fetched from memory."
+    },
+    {
+        "id": "q267",
+        "text": "The instruction fetch stage in a pipelined processor is where the instruction is decoded.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The instruction fetch stage is where the instruction is read from memory, not where it is decoded. Decoding happens in the decode stage."
+    },
+    {
+        "id": "q268",
+        "text": "The execute stage in a pipelined processor is where data is written to or read from memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The execute stage is where arithmetic and logic operations are performed, not where data is written to or read from memory. Memory access happens in the memory access stage."
+    },
+    {
+        "id": "q269",
+        "text": "The memory access stage in a pipelined processor is where the results of an instruction are written to the destination register.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The memory access stage is where data is written to or read from memory, not where results are written to the destination register. That happens in the write-back stage."
+    },
+    {
+        "id": "q270",
+        "text": "The write-back stage in a pipelined processor is where the instruction is decoded.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The write-back stage is where the results of an instruction are written to the destination register, not where the instruction is decoded. Decoding happens in the decode stage."
+    },
+    {
+        "id": "q271",
+        "text": "The primary function of the Memory Management Unit (MMU) is to convert virtual addresses into physical addresses.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU's main purpose is to translate virtual addresses generated by the CPU into physical addresses in the computer's memory."
+    },
+    {
+        "id": "q272",
+        "text": "The MMU is always integrated into the processor and never constructed as a separate Integrated Circuit (IC).",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "While the MMU is usually integrated into the processor, it can also be constructed as a separate Integrated Circuit (IC) in some cases."
+    },
+    {
+        "id": "q273",
+        "text": "The Translation Lookaside Buffer (TLB) is used to store recent virtual-to-physical address translations.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The TLB is a small, fast cache used by the MMU to store recent virtual-to-physical address translations, speeding up the address translation process."
+    },
+    {
+        "id": "q274",
+        "text": "The Page Table Base Register (PTBR) holds the address of the current page table.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The PTBR is a specialized register within the MMU that holds the physical address of the beginning of the page table for the currently executing process."
+    },
+    {
+        "id": "q275",
+        "text": "The MMU uses the page table to map virtual page numbers to physical page numbers in main memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU relies on page tables to store mappings between virtual page numbers and physical page numbers in main memory."
+    },
+    {
+        "id": "q276",
+        "text": "The Modified Bit in a Page Table Entry (PTE) indicates whether the page has been modified or not.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Modified Bit in a PTE indicates whether the page has been modified, which is important for managing memory writes and ensuring data integrity."
+    },
+    {
+        "id": "q277",
+        "text": "The Protection Bit in a Page Table Entry (PTE) defines the access permissions for the page, such as read, write, or execute.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Protection Bit in a PTE defines the access permissions for the page, allowing the operating system to control memory access and protect sensitive data."
+    },
+    {
+        "id": "q278",
+        "text": "The Present/Absent Bit in a Page Table Entry (PTE) indicates whether the page is currently in physical memory or not.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Present/Absent Bit in a PTE indicates whether the page is currently in physical memory, which is crucial for handling page faults."
+    },
+    {
+        "id": "q279",
+        "text": "The MMU can operate in a flat memory model where it uses physical addresses directly without translation.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can operate in a flat memory model where it uses physical addresses directly, bypassing virtual address translation."
+    },
+    {
+        "id": "q280",
+        "text": "The MMU is responsible for managing virtual memory, allowing a system to use disk space as an extension of RAM.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU enables the use of virtual memory, allowing a system to use disk space as an extension of RAM, which facilitates multitasking and large applications."
+    },
+    {
+        "id": "q281",
+        "text": "Memory segmentation is a feature found in certain MMUs that splits the computer's memory into sections with different access permissions.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "Memory segmentation is a feature in some MMUs that divides memory into sections with different access permissions, providing granular control over memory access."
+    },
+    {
+        "id": "q282",
+        "text": "The MMU can generate a page fault when a program accesses a page that is not currently in physical memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can generate a page fault when a program tries to access a page that is not currently in physical memory, prompting the operating system to load the page from disk."
+    },
+    {
+        "id": "q283",
+        "text": "The MMU uses control registers to manage various aspects of memory management, such as paging and access permissions.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU uses control registers to manage memory management processes, including paging, access permissions, and handling page faults."
+    },
+    {
+        "id": "q284",
+        "text": "The MMU can disable paging, which means the system will use physical addresses directly without virtual memory translation.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can disable paging, causing the system to use physical addresses directly, bypassing virtual memory translation."
+    },
+    {
+        "id": "q285",
+        "text": "The MMU can handle memory protection by ensuring that applications can only access memory allocated to them.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU implements memory protection by ensuring that applications can only access memory allocated to them, preventing unauthorized access and enhancing system security."
+    },
+    {
+        "id": "q286",
+        "text": "The MMU can use the Translation Lookaside Buffer (TLB) to speed up the address translation process.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU uses the TLB to cache recent virtual-to-physical address translations, significantly speeding up the address translation process."
+    },
+    {
+        "id": "q287",
+        "text": "The MMU can operate without a page table in some systems.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The MMU typically relies on a page table to map virtual addresses to physical addresses, and it cannot operate without a page table in most systems."
+    },
+    {
+        "id": "q288",
+        "text": "The MMU can handle memory segmentation, which divides memory into sections with different access permissions.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can handle memory segmentation, which divides memory into sections with different access permissions, providing more granular control over memory access."
+    },
+    {
+        "id": "q289",
+        "text": "The MMU can generate a page fault when a program attempts to access a read-only memory segment with write permissions.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can generate a page fault when a program attempts to access a read-only memory segment with write permissions, preventing unauthorized modifications."
+    },
+    {
+        "id": "q290",
+        "text": "The MMU can use the Page Table Base Register (PTBR) to locate the current page table for the executing process.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU uses the PTBR to hold the physical address of the beginning of the page table for the currently executing process, allowing it to locate the current page table."
+    },
+    {
+        "id": "q291",
+        "text": "The MMU can use control registers to enable or disable paging in the system.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can use control registers to enable or disable paging, determining whether the system uses virtual memory or operates in a flat memory model."
+    },
+    {
+        "id": "q292",
+        "text": "The MMU can handle page faults by loading the required page from disk into physical memory.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU can handle page faults by prompting the operating system to load the required page from disk into physical memory, ensuring the program can continue execution."
+    },
+    {
+        "id": "q293",
+        "text": "The MMU can use the Translation Lookaside Buffer (TLB) to cache physical addresses directly.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "b",
+        "explanation": "The TLB caches virtual-to-physical address translations, not physical addresses directly."
+    },
+    {
+        "id": "q294",
+        "text": "The MMU can use the Page Table Entry (PTE) to determine whether a page is present in physical memory or not.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU uses the Present/Absent Bit in the PTE to determine whether a page is present in physical memory or not."
+    },
+    {
+        "id": "q295",
+        "text": "The MMU can use the Modified Bit in the Page Table Entry (PTE) to track whether a page has been modified.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Modified Bit in the PTE is used by the MMU to track whether a page has been modified, which is important for managing memory writes."
+    },
+    {
+        "id": "q296",
+        "text": "The MMU can use the Protection Bit in the Page Table Entry (PTE) to define access permissions for a page.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Protection Bit in the PTE is used by the MMU to define access permissions for a page, such as read, write, or execute permissions."
+    },
+    {
+        "id": "q297",
+        "text": "The MMU can use the Frame Number in the Page Table Entry (PTE) to locate the physical frame in RAM.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Frame Number in the PTE is used by the MMU to locate the physical frame in RAM where the page resides."
+    },
+    {
+        "id": "q298",
+        "text": "The MMU can use the Status Bits in the Page Table Entry (PTE) to determine whether a page is writable or read-only.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The Status Bits in the PTE are used by the MMU to determine whether a page is writable, read-only, or has other access permissions."
+    },
+    {
+        "id": "q299",
+        "text": "The MMU can use the Page Table Base Register (PTBR) to find the base address of the current page table.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The MMU uses the PTBR to hold the physical address of the beginning of the page table for the currently executing process, allowing it to find the base address of the current page table."
+    },
+    {
+        "id": "q300",
+        "text": "The MMU can use the Translation Lookaside Buffer (TLB) to reduce the time required for address translation.",
+        "options": [
+            { "value": "a", text: "True" },
+            { "value": "b", text: "False" }
+        ],
+        "correct": "a",
+        "explanation": "The TLB is used by the MMU to cache recent virtual-to-physical address translations, significantly reducing the time required for address translation."
+    },
+    {
+    "id": "q301",
+    "text": "Why is Silicon (Si) preferred over Germanium (Ge) in semiconductor devices for electronic circuits?",
+    "options": [
+      { "value": "a", "text": "Silicon is more expensive than Germanium." },
+      { "value": "b", "text": "Germanium is more abundant than Silicon." },
+      { "value": "c", "text": "Silicon is less efficient in conducting electricity compared to Germanium." },
+      { "value": "d", "text": "Silicon has a higher band gap, making it less sensitive to temperature changes." }
+    ],
+    "correct": "d"
+  },
+  {
+    "id": "q302",
+    "text": "In Direct Addressing Mode, what does the instruction specify?",
+    "options": [
+      { "value": "a", "text": "A register that contains the data value" },
+      { "value": "b", "text": "The address of the data in memory" },
+      { "value": "c", "text": "The actual data value to be operated on" },
+      { "value": "d", "text": "The address of another address that points to the data" }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q303",
+    "text": "Which of the following is an advantage of using Silicon (Si) over Germanium (Ge) in semiconductor technology?",
+    "options": [
+      { "value": "a", "text": "Germanium has better mechanical strength than Silicon." },
+      { "value": "b", "text": "Germanium forms more stable oxides than Silicon." },
+      { "value": "c", "text": "Silicon can operate at higher temperatures without leakage current issues." },
+      { "value": "d", "text": "Silicon has a lower melting point than Germanium." }
+    ],
+    "correct": "c"
+  },
+  {
+    "id": "q304",
+    "text": "The basic function performed by a computer is execution of a program, which consists of a set of instructions stored in memory. • Two steps of Instructions Cycle: o Fetch o Execute",
+    "options": [
+      { "value": "a", "text": "True" },
+      { "value": "b", "text": "False" }
+    ],
+    "correct": "a"
+  },
+  {
+    "id": "q305",
+    "text": "Which one of these statements is not included in lexical analysis in compiler?",
+    "options": [
+      { "value": "a", "text": "Lexeme" },
+      { "value": "b", "text": "Pattern" },
+      { "value": "c", "text": "Parser" },
+      { "value": "d", "text": "Token" }
+    ],
+    "correct": "c"
+  },
+  {
+    "id": "q306",
+    "text": "Which of the following best describes the difference between ISA and Microarchitecture?",
+    "options": [
+      { "value": "a", "text": "ISA defines the physical design of the processor, while microarchitecture specifies the software instructions." },
+      { "value": "b", "text": "ISA provides the abstract model of a computer that includes supported instructions, while microarchitecture implements the ISA at the hardware level." },
+      { "value": "c", "text": "ISA and microarchitecture are interchangeable terms in computer architecture." },
+      { "value": "d", "text": "ISA specifies the circuit design, and microarchitecture handles input/output operations." }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q307",
+    "text": "Backward Compatibility is a new software can run on existing hardware Example: new software written with SSE2TM runs on older processor which does not support SSE2TM",
+    "options": [
+      { "value": "a", "text": "True" },
+      { "value": "b", "text": "False" }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q308",
+    "text": "When an interrupt is detected by the processor, what is the correct sequence of operations that the processor typically performs?",
+    "options": [
+      { "value": "a", "text": "Save the context, process the interrupt, set the program counter (PC) to the interrupt handler, and restore the context." },
+      { "value": "b", "text": "Process the interrupt immediately without saving the context and then continue with the interrupted program." },
+      { "value": "c", "text": "Suspend the current program, save the context, set the program counter (PC) to the interrupt handler, process the interrupt, and restore the context." },
+      { "value": "d", "text": "Suspend the current program, set the program counter (PC) to the interrupt handler, process the interrupt, save the context, and restore the context." }
+    ],
+    "correct": "c"
+  },
+  {
+    "id": "q309",
+    "text": "What is the primary difference between Direct Addressing Mode and Indirect Addressing Mode?",
+    "options": [
+      { "value": "a", "text": "Direct addressing specifies the memory address of the data, while indirect addressing specifies the address of a pointer that contains the memory address." },
+      { "value": "b", "text": "Indirect addressing always requires fewer instructions than direct addressing." },
+      { "value": "c", "text": "Direct addressing accesses data directly from the CPU registers, while indirect addressing accesses data from I/O devices." },
+      { "value": "d", "text": "Direct addressing is slower than indirect addressing." }
+    ],
+    "correct": "a"
+  },
+  {
+    "id": "q310",
+    "text": "Which of the following is an advantage of Indirect Addressing Mode?",
+    "options": [
+      { "value": "a", "text": "It reduces the number of memory accesses" },
+      { "value": "b", "text": "It provides access to a limited memory range" },
+      { "value": "c", "text": "It requires fewer CPU cycles to execute" },
+      { "value": "d", "text": "It allows for more flexible and dynamic data access" }
+    ],
+    "correct": "d"
+  },
+  {
+    "id": "q311",
+    "text": "According to J-K flip flop, when the state is changed, the Q will be .....?",
+    "options": [
+      { "value": "a", "text": "1" },
+      { "value": "b", "text": "Q = input J" },
+      { "value": "c", "text": "invert" },
+      { "value": "d", "text": "0" }
+    ],
+    "correct": "c"
+  },
+  {
+    "id": "q312",
+    "text": "Which feature of Instruction Set Architecture (ISA) has a significant impact on the design of the microarchitecture?",
+    "options": [
+      { "value": "a", "text": "The manufacturing process technology used" },
+      { "value": "b", "text": "The clock speed of the processor" },
+      { "value": "c", "text": "The type and number of addressing modes available" },
+      { "value": "d", "text": "The number of cache levels" }
+    ],
+    "correct": "c"
+  },
+  {
+    "id": "q313",
+    "text": "................... Contains a word to be stored in memory or sent to the I/O unit or is used to receive a word from memory or from the I/O unit.",
+    "options": [
+      { "value": "a", "text": "IAR" },
+      { "value": "b", "text": "MAR" },
+      { "value": "c", "text": "IBR" },
+      { "value": "d", "text": "MBR" }
+    ],
+    "correct": "d"
+  },
+  {
+    "id": "q314",
+    "text": "In an interrupt system, how does the CPU identify the correct interrupt service routine (ISR) to execute?",
+    "options": [
+      { "value": "a", "text": "The CPU ignores the interrupt and continues normal execution." },
+      { "value": "b", "text": "The device sends an interrupt request along with an interrupt vector containing the ISR address." },
+      { "value": "c", "text": "The CPU uses a fixed address in memory for all ISRs" },
+      { "value": "d", "text": "The CPU polls all devices to find the interrupt source." }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q315",
+    "text": "Which of the following signals is typically carried by the Control Bus in a microprocessor system?",
+    "options": [
+      { "value": "a", "text": "Data values being processed" },
+      { "value": "b", "text": "Memory read and memory write signals" },
+      { "value": "c", "text": "The width of the data bus" },
+      { "value": "d", "text": "The address of the I/O device" }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q316",
+    "text": "Which of the following best describes the purpose of an interrupt vector in a computer system?",
+    "options": [
+      { "value": "a", "text": "It holds the data values that need to be processed by the CPU during an interrupt." },
+      { "value": "b", "text": "It stores the priority levels of all interrupts in the system." },
+      { "value": "c", "text": "It determines the execution speed of the interrupt handler." },
+      { "value": "d", "text": "It contains the address of the interrupt service routine (ISR) for a specific interrupt." }
+    ],
+    "correct": "d"
+  },
+  {
+    "id": "q317",
+    "text": "Computer Design refers to the operational units and their interconnections that realize the architectural specifications. So, for example, the fact that a multiply instruction is available is a computer architecture issue. How that multiply is implemented is a computer organization issue.",
+    "options": [
+      { "value": "a", "text": "False" },
+      { "value": "b", "text": "True" }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q318",
+    "text": "What is the main function of the Address Bus in a computer system?",
+    "options": [
+      { "value": "a", "text": "To transfer control signals between the CPU and other devices" },
+      { "value": "b", "text": "To specify the address of the memory location being accessed by the CPU" },
+      { "value": "c", "text": "To carry the actual data between the processor and memory" },
+      { "value": "d", "text": "To synchronize the clock signals across all system components" }
+    ],
+    "correct": "b"
+  },
+  {
+    "id": "q319",
+    "text": "Which one of these statements is not included in Fetch Cycle?",
+    "options": [
+      { "value": "a", "text": "Instruction loaded into Instruction Register (IR)." },
+      { "value": "b", "text": "Data/instruction transfer between CPU and main memory" },
+      { "value": "c", "text": "Processor fetches instruction from memory location pointed to by PC." },
+      { "value": "d", "text": "Program Counter (PC) holds address of next instruction to fetch." }
+    ],
+    "correct": "b"
+  },      
+    
+      ];
+
+        let currentScore = 0;
+        const scoreDisplay = document.getElementById('score');
+        
+        // Function to shuffle an array using Fisher-Yates algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createQuiz() {
+    const container = document.getElementById('quiz-container');
+    
+    /*
+    // Shuffle the questions array
+    const shuffledQuestions = shuffleArray([...questions]); // تم تعليق الخلط
+    */
+    
+    // استخدام الأسئلة الأصلية بدون خلط
+    questions.forEach((question, index) => {
+        const questionCard = document.createElement('div');
+        questionCard.className = 'question-card';
+        
+        // Shuffle the options for each question
+        const shuffledOptions = shuffleArray([...question.options]);
+        
+        questionCard.innerHTML = `
+            <p class="question-text">${index + 1}. ${question.text}
+                <button class="show-explanation-btn" onclick="toggleExplanation('${question.id}')">Show Explanation</button>
+            </p>
+            <div class="options-container">
+                ${shuffledOptions.map(option => `
+                    <label class="option-label">
+                        <input type="radio" name="${question.id}" value="${option.value}" 
+                               onchange="checkAnswer('${question.id}', '${option.value}', '${question.correct}')">
+                        ${option.text}
+                    </label>
+                `).join('')}
+            </div>
+            <div class="feedback" id="feedback-${question.id}"></div>
+            <div class="explanation" id="explanation-${question.id}">
+                <strong>Explanation:</strong> ${question.explanation}
+            </div>
+        `;
+        
+        container.appendChild(questionCard);
+    });
+}
+
+        function toggleExplanation(questionId) {
+            const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+            const explanationElement = document.getElementById(`explanation-${questionId}`);
+            
+            if (!selectedOption) {
+                alert('Please select an answer before viewing the explanation.');
+                return;
+            }
+
+            if (explanationElement.style.display === 'none' || !explanationElement.style.display) {
+                explanationElement.style.display = 'block';
+            } else {
+                explanationElement.style.display = 'none';
+            }
+        }
+
+        function checkAnswer(questionId, selected, correct) {
+            const feedbackElement = document.getElementById(`feedback-${questionId}`);
+            const previousFeedback = feedbackElement.className.includes('correct');
+            const isCorrect = selected === correct;
+            
+            if (isCorrect) {
+                feedbackElement.textContent = 'Correct!';
+                feedbackElement.className = 'feedback correct';
+                if (!previousFeedback) currentScore++;
+            } else {
+                feedbackElement.textContent = 'Incorrect!';
+                feedbackElement.className = 'feedback incorrect';
+                if (previousFeedback) currentScore--;
+            }
+            
+            scoreDisplay.textContent = currentScore;
+        }
+
+        function calculateFinalScore() {
+            const resultContainer = document.getElementById('result');
+            const finalScoreElement = document.getElementById('finalScore');
+            const percentageElement = document.getElementById('percentage');
+            
+            const percentage = ((currentScore / questions.length) * 100).toFixed(2);
+            
+            finalScoreElement.textContent = `You scored ${currentScore} out of ${questions.length}`;
+            percentageElement.textContent = `Percentage: ${percentage}%`;
+            
+            resultContainer.className = 'result-container show';
+        }
+
+        // Initialize the quiz when the page loads
+        window.onload = createQuiz;
+    </script>
+</body>
+</html>
