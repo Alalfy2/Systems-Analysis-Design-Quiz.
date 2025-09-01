@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>smart phone</title>
+    <title>Data Mining Quiz</title>
     <style>
-:root {
+        :root {
             --primary-color: #4CAF50;
             --hover-color: #45a049;
             --background-color: #f9f9f9;
@@ -141,13 +141,16 @@
             .question-card {
                 padding: 15px;
             }
-        }          .explanation {
+        }
+
+        .explanation {
             margin-top: 10px;
             padding: 10px;
             background-color: #e3f2fd;
             border-radius: 8px;
             display: none;
         }
+        
         .show-explanation-btn {
             margin-left: 10px;
             padding: 5px 10px;
@@ -157,20 +160,47 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        
         .show-explanation-btn:hover {
             background-color: #45a049;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .page-btn {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .page-btn:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .page-btn.active {
+            background-color: #2c6b2f;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>smart phone</h1>
+        <h1>Data Mining Quiz</h1>
         
         <div class="score-display" id="currentScore">
             Current Score: <span id="score">0</span>
         </div>
 
         <div id="quiz-container"></div>
+        
+        <div class="pagination" id="pagination"></div>
 
         <button class="submit-btn" onclick="calculateFinalScore()">Submit Quiz</button>
 
@@ -183,7 +213,8 @@
 
     <script>
         const questions = [
-                {
+           
+            {
         "id": 1,
         "text": "What is the primary goal of data mining?",
         "options": {
@@ -1742,12 +1773,14 @@
         },
         "correct": "c",
         "explanation": "Gender is qualitative."
-    },
-    
-      ];
+    }
+            // يمكنك إضافة المزيد من الأسئلة الفريدة هنا
+        ];
 
         let currentScore = 0;
         const scoreDisplay = document.getElementById('score');
+        const questionsPerPage = 5;
+        let currentPage = 1;
         
         // Function to shuffle an array using Fisher-Yates algorithm
         function shuffleArray(array) {
@@ -1759,43 +1792,63 @@
         }
 
         function createQuiz() {
-    const container = document.getElementById('quiz-container');
-    
-    /*
-    // Shuffle the questions array
-    const shuffledQuestions = shuffleArray([...questions]); // تم تعليق الخلط
-    */
-    
-    // استخدام الأسئلة الأصلية بدون خلط
-    questions.forEach((question, index) => {
-        const questionCard = document.createElement('div');
-        questionCard.className = 'question-card';
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * questionsPerPage;
+            const endIndex = Math.min(startIndex + questionsPerPage, questions.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const question = questions[i];
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                
+                // Convert options object to array for shuffling
+                const optionsArray = Object.entries(question.options).map(([value, text]) => ({ value, text }));
+                const shuffledOptions = shuffleArray(optionsArray);
+                
+                questionCard.innerHTML = `
+                    <p class="question-text">${i + 1}. ${question.text}
+                        <button class="show-explanation-btn" onclick="toggleExplanation(${question.id})">Show Explanation</button>
+                    </p>
+                    <div class="options-container">
+                        ${shuffledOptions.map(option => `
+                            <label class="option-label">
+                                <input type="radio" name="${question.id}" value="${option.value}" 
+                                       onchange="checkAnswer(${question.id}, '${option.value}', '${question.correct}')">
+                                ${option.value.toUpperCase()}. ${option.text}
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="feedback" id="feedback-${question.id}"></div>
+                    <div class="explanation" id="explanation-${question.id}">
+                        <strong>Explanation:</strong> ${question.explanation}
+                    </div>
+                `;
+                
+                container.appendChild(questionCard);
+            }
+            
+            createPagination();
+        }
         
-        // Shuffle the options for each question
-        const shuffledOptions = shuffleArray([...question.options]);
-        
-        questionCard.innerHTML = `
-            <p class="question-text">${index + 1}. ${question.text}
-                <button class="show-explanation-btn" onclick="toggleExplanation('${question.id}')">Show Explanation</button>
-            </p>
-            <div class="options-container">
-                ${shuffledOptions.map(option => `
-                    <label class="option-label">
-                        <input type="radio" name="${question.id}" value="${option.value}" 
-                               onchange="checkAnswer('${question.id}', '${option.value}', '${question.correct}')">
-                        ${option.text}
-                    </label>
-                `).join('')}
-            </div>
-            <div class="feedback" id="feedback-${question.id}"></div>
-            <div class="explanation" id="explanation-${question.id}">
-                <strong>Explanation:</strong> ${question.explanation}
-            </div>
-        `;
-        
-        container.appendChild(questionCard);
-    });
-}
+        function createPagination() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            
+            const totalPages = Math.ceil(questions.length / questionsPerPage);
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageButton.textContent = i;
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    createQuiz();
+                };
+                paginationContainer.appendChild(pageButton);
+            }
+        }
 
         function toggleExplanation(questionId) {
             const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
