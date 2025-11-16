@@ -3365,7 +3365,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         
-        // --- إعدادات شريط التقدم ---
+        
         let score = 0;
         let totalAnswered = 0;
         const totalQuestions = document.querySelectorAll('.question-card').length;
@@ -3375,7 +3375,7 @@
         progressText.textContent = `0 / ${totalQuestions} Answered`;
 
         
-        // --- زر إعادة التعيين ---
+        
         const resetQuizBtn = document.getElementById('reset-quiz');
         resetQuizBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to reset the quiz? Your progress will be lost.')) {
@@ -3383,18 +3383,18 @@
             }
         });
 
-        // --- (جديد) زر تفعيل/إلغاء المؤثرات ---
-        let isEffectsEnabled = true; // الافتراضي هو "مفعل"
+        
+        let isEffectsEnabled = true; 
         const effectsToggleBtn = document.getElementById('toggle-effects');
         
-        // التحقق من الإعداد المحفوظ
+        
         if (localStorage.getItem('effects') === 'disabled') {
             isEffectsEnabled = false;
             effectsToggleBtn.textContent = '🚫';
         }
 
         effectsToggleBtn.addEventListener('click', () => {
-            isEffectsEnabled = !isEffectsEnabled; // تبديل الحالة
+            isEffectsEnabled = !isEffectsEnabled; 
             if (isEffectsEnabled) {
                 effectsToggleBtn.textContent = '✨';
                 localStorage.setItem('effects', 'enabled');
@@ -3404,7 +3404,7 @@
             }
         });
         
-        // --- ميزة 1: تبديل الوضع الليلي ---
+        
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         if (localStorage.getItem('theme') === 'dark') {
@@ -3423,7 +3423,7 @@
         });
 
         
-        // --- ميزة 2: تغيير ترتيب الأسئلة ---
+        
         const quizContainer = document.querySelector('.quiz-container');
         const questionCards = Array.from(quizContainer.querySelectorAll('.question-card'));
         for (let i = questionCards.length - 1; i > 0; i--) {
@@ -3433,7 +3433,7 @@
         questionCards.forEach(card => quizContainer.appendChild(card));
 
         
-        // --- ميزة 3: إعادة ترقيم الأسئلة ---
+        
         questionCards.forEach((card, index) => {
             const titleElement = card.querySelector('h2');
             if (titleElement) {
@@ -3443,7 +3443,7 @@
         });
 
         
-        // --- ميزة 4: خلط الخيارات وإعادة تسمية الأحرف ---
+        
         const allOptionsLists = document.querySelectorAll('.options');
         const letters = ['A', 'B', 'C', 'D', 'E', 'F']; 
         allOptionsLists.forEach(ul => {
@@ -3462,7 +3462,7 @@
         });
 
         
-        // --- دالة تشغيل البالونات ---
+        
         const createBalloons = () => {
             const emojis = ['🎈', '🎉', '🎊', '🥳', '✨', '⭐'];
             const balloonCount = 15; 
@@ -3483,7 +3483,7 @@
         };
 
 
-        // --- ميزة 5: منطق الضغط على الزر (للانزلاق) ---
+        
         const allToggleButtons = document.querySelectorAll('.toggle-answer');
         allToggleButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -3493,7 +3493,7 @@
         });
 
         
-        // --- ميزة 6: (معدل) منطق الضغط على الخيار ---
+        
         allOptionsLists.forEach(optionsList => {
             optionsList.addEventListener('click', (event) => {
                 if (event.target.tagName !== 'LI') return;
@@ -3506,13 +3506,13 @@
 
                 totalAnswered++;
 
-                // التحقق من الإجابة
+                
                 if (selectedLi.hasAttribute('data-correct')) {
                     selectedLi.classList.add('correct');
                     score++;
                     
-                    // --- (هنا التعديل!) ---
-                    // التحقق إذا كانت المؤثرات مفعلة قبل تشغيلها
+                    
+                    
                     if (isEffectsEnabled) {
                         createBalloons();
                     }
@@ -3525,7 +3525,7 @@
                     }
                 }
                 
-                // تحديث شريط التقدم والنص
+                
                 const progressPercent = (totalAnswered / totalQuestions) * 100;
                 progressBar.style.width = `${progressPercent}%`;
                 progressText.textContent = `${score} / ${totalQuestions} Correct (${totalAnswered} Answered)`;
